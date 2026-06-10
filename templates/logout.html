@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusSearch – Goodbye!</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta http-equiv="refresh" content="5;url=/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--pri:#ff6a00;--sec:#cc2200;--bg:#0a0500;--text:#f5e6d8;--muted:#8a6a50}
+body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,106,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,106,0,0.04) 1px,transparent 1px);background-size:60px 60px;animation:gm 20s linear infinite}
+@keyframes gm{from{transform:translateY(0)}to{transform:translateY(60px)}}
+.orb{position:fixed;border-radius:50%;filter:blur(100px);z-index:0}
+.o1{width:600px;height:600px;background:rgba(255,106,0,0.07);top:-200px;left:-200px;animation:f 8s ease-in-out infinite}
+.o2{width:500px;height:500px;background:rgba(204,34,0,0.09);bottom:-150px;right:-150px;animation:f 10s ease-in-out infinite reverse}
+@keyframes f{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,15px)}}
+.card{position:relative;z-index:10;text-align:center;padding:70px 60px;background:rgba(255,106,0,0.03);border:1px solid rgba(255,106,0,0.18);border-radius:28px;backdrop-filter:blur(20px);box-shadow:0 0 80px rgba(255,106,0,0.07),0 30px 60px rgba(0,0,0,.6);animation:pi .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pi{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.wave{font-size:70px;display:block;margin-bottom:24px;animation:wv 1.2s ease-in-out 3}
+@keyframes wv{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-20deg)}40%,80%{transform:rotate(20deg)}}
+.brand{font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:var(--pri);letter-spacing:3px;margin-bottom:16px}
+.title{font-family:'Orbitron',monospace;font-size:32px;font-weight:800;line-height:1.2;margin-bottom:12px}
+.title span{background:linear-gradient(135deg,var(--pri),var(--sec));background-clip: 2;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{font-size:15px;color:var(--muted);margin-bottom:36px;line-height:1.6}
+.cw{margin-bottom:30px}
+.ct{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.cb{width:200px;height:3px;background:rgba(255,106,0,0.1);border-radius:2px;margin:0 auto;overflow:hidden}
+.cf{height:100%;background:linear-gradient(90deg,var(--pri),var(--sec));border-radius:2px;animation:cd 5s linear forwards}
+@keyframes cd{from{width:100%}to{width:0%}}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 30px;background:linear-gradient(135deg,var(--pri),var(--sec));border:none;border-radius:12px;color:#fff;font-weight:700;font-size:14px;text-decoration:none;font-family:'Rajdhani',sans-serif;letter-spacing:1px;cursor:pointer;transition:all .3s}
+.btn:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(255,106,0,0.35)}
+</style>
+</head>
+<body>
+<div class="grid"></div><div class="orb o1"></div><div class="orb o2"></div>
+<div class="card">
+  <span class="wave">👋</span>
+  <div class="brand">NEXUSSEARCH</div>
+  <div class="title">Goodbye,<br><span>{{ user_name }}!</span></div>
+  <p class="sub">You've been logged out successfully.<br>Your search journey is saved. Come back anytime!</p>
+  <div class="cw">
+    <div class="ct">Redirecting to login in 5 seconds</div>
+    <div class="cb"><div class="cf"></div></div>
+  </div>
+  <a href="/" class="btn">🔥 Login Again</a>
+</div>
+</body>
+</html>

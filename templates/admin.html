@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusSearch – Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--pri:#ff6a00;--sec:#cc2200;--gold:#ffd700;--bg:#0a0500;--surface:rgba(255,106,0,0.05);--border:rgba(255,106,0,0.15);--text:#f5e6d8;--muted:#8a6a50}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden}
+.grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,106,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,106,0,0.03) 1px,transparent 1px);background-size:80px 80px}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;padding:14px 28px;background:rgba(10,5,0,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,200,0,0.2);display:flex;align-items:center;justify-content:space-between}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-icon{width:34px;height:34px;background:linear-gradient(135deg,#b8860b,var(--gold));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 0 14px rgba(255,215,0,0.3)}
+.nav-title{font-family:'Orbitron',monospace;font-size:14px;font-weight:900;letter-spacing:2px}
+.nav-title span{color:var(--gold)}
+.nav-badge{padding:3px 10px;background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.3);border-radius:20px;font-size:10px;font-weight:700;color:var(--gold);letter-spacing:1px;margin-left:8px}
+.nav-right{display:flex;gap:10px;align-items:center}
+.nav-time{font-size:11px;color:var(--muted)}
+.nav-time span{color:var(--text)}
+.btn-back{padding:7px 14px;background:rgba(255,106,0,0.07);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;text-decoration:none;transition:all .2s}
+.btn-back:hover{border-color:var(--pri);color:var(--pri)}
+.btn-refresh{padding:7px 14px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.25);border-radius:8px;color:var(--gold);font-size:12px;cursor:pointer;transition:all .2s;text-decoration:none}
+.btn-refresh:hover{background:rgba(255,215,0,0.15)}
+.btn-logout{padding:7px 14px;background:rgba(204,34,0,0.1);border:1px solid rgba(204,34,0,0.28);border-radius:8px;color:#ff8866;font-size:12px;text-decoration:none;transition:all .2s}
+
+/* MAIN */
+main{max-width:1300px;margin:0 auto;padding:32px 36px;position:relative;z-index:1}
+
+/* PAGE HEADER */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:14px}
+.ph-title{font-family:'Orbitron',monospace;font-size:26px;font-weight:900;color:var(--text)}
+.ph-title span{color:var(--gold)}
+.ph-sub{font-size:13px;color:var(--muted);margin-top:5px}
+.live-badge{display:flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:20px;font-size:11px;font-weight:600;color:#86efac}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+
+/* STAT CARDS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;text-align:center;animation:ci .5s ease both;transition:all .3s;position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;inset:0;opacity:0;background:radial-gradient(circle at 50% 0%,rgba(255,106,0,0.12),transparent 70%);transition:opacity .3s}
+.sc:hover{border-color:var(--pri);transform:translateY(-3px)}
+.sc:hover::before{opacity:1}
+.sc:nth-child(1){animation-delay:.05s}.sc:nth-child(2){animation-delay:.1s}
+.sc:nth-child(3){animation-delay:.15s}.sc:nth-child(4){animation-delay:.2s}
+@keyframes ci{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.sc-icon{font-size:30px;margin-bottom:10px}
+.sc-num{font-family:'Orbitron',monospace;font-size:34px;font-weight:900;color:var(--pri)}
+.sc-num.gold{color:var(--gold)}
+.sc-num.green{color:#22c55e}
+.sc-num.red{color:#ef4444}
+.sc-label{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:1px}
+
+/* CHARTS */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;animation:ci .6s ease both}
+.chart-box:nth-child(1){animation-delay:.1s}.chart-box:nth-child(2){animation-delay:.2s}
+.chart-title{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.chart-title span{color:var(--gold)}
+.chart-wrap{position:relative;height:200px}
+
+/* SECTION */
+.section{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:22px;animation:ci .5s ease both}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.sec-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.sec-title span{color:var(--gold)}
+.sec-badge{padding:3px 10px;background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.25);border-radius:20px;font-size:11px;font-weight:700;color:var(--gold)}
+.sec-search{display:flex;gap:8px}
+.s-inp{background:rgba(255,106,0,0.06);border:1px solid var(--border);border-radius:9px;padding:8px 14px;color:var(--text);font-size:12px;font-family:'Inter',sans-serif;outline:none;transition:all .3s;width:220px}
+.s-inp:focus{border-color:var(--pri)}
+.s-inp::placeholder{color:var(--muted)}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse}
+.tbl thead tr{background:rgba(255,106,0,0.08)}
+.tbl th{padding:12px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);text-align:left;border-bottom:1px solid var(--border)}
+.tbl td{padding:13px 16px;font-size:13px;border-bottom:1px solid rgba(255,106,0,0.06);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,106,0,0.03)}
+.tbl tr{transition:background .2s}
+
+/* TABLE ELEMENTS */
+.user-row{display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--sec));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;border:2px solid rgba(255,106,0,0.3)}
+.user-name{font-weight:600;color:var(--text);font-size:13px}
+.user-email{font-size:11px;color:var(--muted)}
+.email-pill{display:inline-block;padding:2px 8px;background:rgba(255,106,0,0.08);border-radius:4px;font-size:12px;color:#c49a7a;font-family:'Inter',sans-serif}
+.date-text{font-size:12px;color:var(--muted)}
+.id-badge{padding:2px 8px;background:rgba(255,106,0,0.08);border-radius:4px;font-size:11px;font-weight:700;color:var(--pri);font-family:'Orbitron',monospace}
+.status-s{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(34,197,94,0.12);color:#86efac;border:1px solid rgba(34,197,94,0.25)}
+.status-f{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25)}
+.empty-row{text-align:center;padding:40px;color:var(--muted);font-size:13px;font-style:italic}
+
+/* NO DATA */
+.no-data{text-align:center;padding:40px 20px}
+.no-data-icon{font-size:48px;margin-bottom:12px;opacity:.4}
+.no-data-text{font-family:'Orbitron',monospace;font-size:14px;color:var(--muted)}
+.no-data-sub{font-size:12px;color:var(--muted);margin-top:6px;opacity:.7}
+
+footer{border-top:1px solid var(--border);padding:20px 36px;text-align:center;color:var(--muted);font-size:12px;position:relative;z-index:1}
+footer span{color:var(--gold)}
+
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.charts-row{grid-template-columns:1fr}}
+@media(max-width:600px){main{padding:18px}.stats{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="grid"></div>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-icon">👑</div>
+    <div>
+      <div class="nav-title">NEXUS<span>SEARCH</span></div>
+    </div>
+    <span class="nav-badge">ADMIN PANEL</span>
+  </div>
+  <div class="nav-right">
+    <div class="nav-time">Logged in as <span>Admin</span></div>
+    <a href="/admin?key=nexusadmin2024" class="btn-refresh">🔄 Refresh</a>
+    <a href="/dashboard" class="btn-back">🏠 Dashboard</a>
+    <a href="/" class="btn-logout">⏻ Logout</a>
+  </div>
+</nav>
+
+<main>
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="ph-left">
+      <div class="ph-title">Admin <span>Dashboard</span></div>
+      <div class="ph-sub">Complete overview of all users, registrations and login activity</div>
+    </div>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      Live Data — Updated Now
+    </div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stats">
+    <div class="sc">
+      <div class="sc-icon">👥</div>
+      <div class="sc-num">{{ total_users }}</div>
+      <div class="sc-label">Total Users Registered</div>
+    </div>
+    <div class="sc">
+      <div class="sc-icon">📅</div>
+      <div class="sc-num gold">{{ todays_logins }}</div>
+      <div class="sc-label">Logins Today</div>
+    </div>
+    <div class="sc">
+      <div class="sc-icon">🔑</div>
+      <div class="sc-num green">{{ login_logs|length }}</div>
+      <div class="sc-label">Total Login Events</div>
+    </div>
+    <div class="sc">
+      <div class="sc-icon">🔥</div>
+      <div class="sc-num">{{ all_users|length }}</div>
+      <div class="sc-label">Active Accounts</div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts-row">
+    <div class="chart-box">
+      <div class="chart-title">📈 User <span>Registrations</span></div>
+      <div class="chart-wrap"><canvas id="regChart"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">🔑 Login <span>Activity</span></div>
+      <div class="chart-wrap"><canvas id="loginChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ALL USERS TABLE -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-title">
+        👥 All Registered Users
+        <span class="sec-badge">{{ total_users }} Total</span>
+      </div>
+      <div class="sec-search">
+        <input type="text" class="s-inp" id="userSearch" placeholder="🔍 Search name or email..." oninput="filterTable('userTbody', this.value)">
+      </div>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>User</th>
+            <th>Email</th>
+            <th>User ID</th>
+            <th>Registered On</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="userTbody">
+          {% if all_users %}
+            {% for user in all_users %}
+            <tr>
+              <td style="color:var(--muted);font-weight:600">{{ loop.index }}</td>
+              <td>
+                <div class="user-row">
+                  <div class="avatar">{{ user.name[0].upper() }}</div>
+                  <div>
+                    <div class="user-name">{{ user.name }}</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="email-pill">{{ user.email }}</span></td>
+              <td><span class="id-badge">#{{ user.id }}</span></td>
+              <td><span class="date-text">{{ user.created_at }}</span></td>
+              <td><span class="status-s">✅ Active</span></td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="6">
+                <div class="no-data">
+                  <div class="no-data-icon">👥</div>
+                  <div class="no-data-text">No users registered yet</div>
+                  <div class="no-data-sub">Users will appear here after registration</div>
+                </div>
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>

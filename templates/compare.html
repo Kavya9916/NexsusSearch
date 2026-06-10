@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusSearch – Compare</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--pri:#ff6a00;--sec:#cc2200;--gold:#ffd700;--bg:#0a0500;--surface:rgba(255,106,0,0.05);--border:rgba(255,106,0,0.15);--text:#f5e6d8;--muted:#8a6a50}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+.grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,106,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,106,0,0.03) 1px,transparent 1px);background-size:80px 80px}
+nav{position:sticky;top:0;z-index:100;padding:12px 24px;background:rgba(10,5,0,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.nl{display:flex;align-items:center;gap:14px}
+.nb{display:flex;align-items:center;gap:8px;text-decoration:none}
+.ni{width:28px;height:28px;background:linear-gradient(135deg,var(--pri),var(--sec));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.nn{font-family:'Orbitron',monospace;font-size:12px;font-weight:900;color:var(--pri);letter-spacing:2px}
+.nr{display:flex;gap:8px}
+.btn-bk{padding:6px 13px;background:rgba(255,106,0,.07);border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:12px;text-decoration:none;transition:all .2s}
+.btn-bk:hover{border-color:var(--pri);color:var(--pri)}
+main{max-width:1200px;margin:0 auto;padding:28px 24px;position:relative;z-index:1}
+.ph{text-align:center;margin-bottom:28px}
+.ph-title{font-family:'Orbitron',monospace;font-size:26px;font-weight:900;margin-bottom:8px}
+.ph-title span{color:var(--gold)}
+.ph-sub{font-size:13px;color:var(--muted)}
+
+/* SEARCH BOX */
+.cmp-search{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:28px}
+.cs-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.cs-cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.cs-cat{padding:7px 14px;background:rgba(255,106,0,.07);border:1px solid rgba(255,106,0,.15);border-radius:8px;font-size:12px;font-weight:600;color:#c49a7a;cursor:pointer;transition:all .2s}
+.cs-cat:hover,.cs-cat.sel{background:rgba(255,215,0,.12);border-color:var(--gold);color:var(--gold)}
+.cs-row{display:flex;gap:10px}
+.cs-in{flex:1;background:rgba(255,106,0,.06);border:1.5px solid var(--border);border-radius:11px;padding:12px 18px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:all .3s}
+.cs-in:focus{border-color:var(--pri);background:rgba(255,106,0,.08)}
+.cs-in::placeholder{color:var(--muted)}
+.cs-btn{padding:12px 24px;background:linear-gradient(135deg,var(--pri),var(--sec));border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:700;font-family:'Rajdhani',sans-serif;cursor:pointer;transition:all .2s}
+.cs-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.cs-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+/* STEP 1 — SELECT ITEMS */
+.step-label{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px}
+.step-label span{color:var(--pri)}
+.loading{display:none;text-align:center;padding:40px}
+.loading.show{display:block}
+.spin{width:40px;height:40px;border:3px solid rgba(255,106,0,.1);border-top-color:var(--pri);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:24px}
+.sel-card{background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:15px;cursor:pointer;transition:all .3s;position:relative}
+.sel-card:hover{border-color:var(--pri);transform:translateY(-2px)}
+.sel-card.chosen{border-color:var(--gold);background:rgba(255,215,0,.06)}
+.sel-card.chosen::after{content:'✅';position:absolute;top:10px;right:10px;font-size:16px}
+.sc-plat{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;margin-bottom:8px;padding:3px 8px;border-radius:5px;width:fit-content}
+.sc-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sc-price{font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:var(--pri);margin-bottom:4px}
+.sc-meta{font-size:11px;color:var(--muted)}
+.sel-count{font-size:12px;color:var(--muted);margin-bottom:14px}
+.sel-count b{color:var(--gold)}
+
+/* COMPARE BTN */
+.cmp-btn-row{display:flex;justify-content:center;margin-bottom:28px}
+.cmp-btn{padding:13px 36px;background:linear-gradient(135deg,var(--gold),var(--pri));border:none;border-radius:12px;color:#000;font-size:15px;font-weight:700;font-family:'Rajdhani',sans-serif;letter-spacing:1px;cursor:pointer;transition:all .2s;display:none}
+.cmp-btn.show{display:block}
+.cmp-btn:hover{filter:brightness(1.1);transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,215,0,.25)}
+
+/* COMPARE TABLE */
+#cmpResult{display:none}
+#cmpResult.show{display:block;animation:fu .5s ease}
+@keyframes fu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.cmp-tbl-wrap{overflow-x:auto;margin-bottom:24px}
+.cmp-tbl{width:100%;border-collapse:collapse;min-width:600px}
+.cmp-tbl th{padding:14px 16px;text-align:center;background:rgba(255,106,0,.08);font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border);position:sticky;top:58px;z-index:10}
+.cmp-tbl th.item-head{background:rgba(255,106,0,.12);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:14px;text-transform:none}
+.cmp-tbl td{padding:12px 16px;text-align:center;border-bottom:1px solid rgba(255,106,0,.07);font-size:13px;vertical-align:middle}
+.cmp-tbl td.row-label{text-align:left;font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;background:rgba(255,106,0,.03);white-space:nowrap}
+.cmp-tbl tr:hover td{background:rgba(255,106,0,.03)}
+.winner-cell{color:var(--gold);font-weight:700}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700}
+.badge-gold{background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.3)}
+.badge-green{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.25)}
+.price-cell{font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:var(--pri)}
+
+/* VERDICT */
+.verdict{background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,106,0,.05));border:1px solid rgba(255,215,0,.25);border-radius:16px;padding:24px;margin-bottom:24px}
+.verdict-title{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:var(--gold);margin-bottom:16px;text-align:center}
+.verdict-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.vcard{background:rgba(255,106,0,.05);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.vcard-icon{font-size:28px;margin-bottom:8px}
+.vcard-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.vcard-name{font-size:14px;font-weight:700;color:var(--text)}
+.vcard-reason{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* CHARTS */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
+.ct{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px}
+.ct span{color:var(--pri)}
+.cw{position:relative;height:200px}
+
+.reset-btn{display:block;margin:0 auto 20px;padding:10px 24px;background:rgba(255,106,0,.08);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s}
+.reset-btn:hover{border-color:var(--pri);color:var(--pri)}
+
+footer{border-top:1px solid var(--border);padding:16px 24px;text-align:center;color:var(--muted);font-size:12px;position:relative;z-index:1;margin-top:20px}
+footer span{color:var(--pri)}
+@media(max-width:700px){.verdict-grid{grid-template-columns:1fr}.charts-row{grid-template-columns:1fr}.cs-row{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="grid"></div>
+<nav>
+  <div class="nl">
+    <a href="/dashboard" class="nb"><div class="ni">🔥</div><div class="nn">NEXUS</div></a>
+    <div style="font-size:13px;font-weight:600;color:var(--gold)">⚖️ Compare Tool</div>
+  </div>
+  <div class="nr">
+    <a href="/dashboard" class="btn-bk">← Dashboard</a>
+    <a href="/logout" class="btn-bk">⏻ Logout</a>
+  </div>
+</nav>
+
+<main>
+  <div class="ph">
+    <h1 class="ph-title">Side-by-Side <span>Comparison</span></h1>
+    <p class="ph-sub">Search → Select 2 to 4 items → Compare instantly with Smart Verdict</p>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="cmp-search">
+    <div class="cs-label">Select Category</div>
+    <div class="cs-cats">
+      <div class="cs-cat sel" onclick="setCC('courses',this)">🎓 Courses</div>
+      <div class="cs-cat" onclick="setCC('jobs',this)">💼 Jobs</div>
+      <div class="cs-cat" onclick="setCC('shopping',this)">🛒 Shopping</div>
+      <div class="cs-cat" onclick="setCC('scholarships',this)">🏆 Scholarships</div>
+      <div class="cs-cat" onclick="setCC('coding',this)">💻 Coding</div>
+      <div class="cs-cat" onclick="setCC('entertainment',this)">🎬 Entertainment</div>
+    </div>
+    <div class="cs-row">
+      <input type="text" class="cs-in" id="cmpIn" placeholder="Search to compare... e.g. Python course, Samsung mobile..." onkeypress="if(event.key==='Enter')fetchItems()">
+      <button class="cs-btn" id="cmpSearchBtn" onclick="fetchItems()">🔍 Search</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading" id="cmpLoad"><div class="spin"></div><div style="font-family:'Orbitron',monospace;font-size:12px;color:var(--muted)">FETCHING RESULTS...</div></div>
+
+  <!-- STEP 1 — SELECT -->
+  <div id="selSection" style="display:none">
+    <div class="step-label">Step 1 — <span>Select 2 to 4 items</span> to compare</div>
+    <div class="sel-count" id="selCount">Selected: <b>0 / 4</b></div>
+    <div class="sel-grid" id="selGrid"></div>
+    <div class="cmp-btn-row">
+      <button class="cmp-btn" id="cmpGoBtn" onclick="buildComparison()">⚖️ COMPARE SELECTED ITEMS</button>
+    </div>
+  </div>
+
+  <!-- COMPARE RESULT -->
+  <div id="cmpResult">
+    <!-- Verdict -->
+    <div class="verdict">
+      <div class="verdict-title">🏆 Smart Verdict</div>
+      <div class="verdict-grid" id="verdictGrid"></div>
+    </div>
+
+    <!-- Table -->
+    <div class="cmp-tbl-wrap">
+      <table class="cmp-tbl" id="cmpTable"></table>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+      <div class="chart-box"><div class="ct">Rating <span>Comparison</span></div><div class="cw"><canvas id="ratingChart"></canvas></div></div>
+      <div class="chart-box"><div class="ct">Price <span>Comparison</span></div><div class="cw"><canvas id="priceChart"></canvas></div></div>
+    </div>
+
+    <button class="reset-btn" onclick="resetCompare()">🔄 Start New Comparison</button>
+  </div>
+</main>
+
+<footer>⚖️ Compare Tool — <span>NexusSearch</span></footer>
+
+<script>
+let cmpCat      = 'courses';
+let allItems    = [];
+let selItems    = [];
+let ratingInst  = null, priceInst = null;
+
+function setCC(cat, el) {
+  cmpCat = cat;
+  document.querySelectorAll('.cs-cat').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  const hints = {courses:'e.g. Python course, Web development...',jobs:'e.g. Software Engineer, Data Analyst...',shopping:'e.g. Samsung phone, Nike shoes...',scholarships:'e.g. Merit scholarship...',coding:'e.g. DSA problems...',entertainment:'e.g. Action movies...'};
+  document.getElementById('cmpIn').placeholder = hints[cat] || 'Search to compare...';
+}
+
+function fetchItems() {
+  const q = document.getElementById('cmpIn').value.trim();
+  if (!q) { document.getElementById('cmpIn').focus(); return; }
+
+  document.getElementById('cmpLoad').classList.add('show');
+  document.getElementById('selSection').style.display = 'none';
+  document.getElementById('cmpResult').classList.remove('show');
+  document.getElementById('cmpSearchBtn').disabled = true;
+  document.getElementById('cmpSearchBtn').textContent = '⏳ Searching...';
+  selItems = [];
+
+  fetch('/search', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({query:q, category:cmpCat, budget:null})
+  })
+  .then(r => r.json())
+  .then(data => {
+    document.getElementById('cmpLoad').classList.remove('show');
+    document.getElementById('cmpSearchBtn').disabled = false;
+    document.getElementById('cmpSearchBtn').textContent = '🔍 Search';
+
+    allItems = data.results || [];
+    console.log('Compare items:', allItems.length);
+
+    if (!allItems.length) {
+      alert('No results found. Try different keywords!');
+      return;
+    }
+
+    renderSelGrid();
+    document.getElementById('selSection').style.display = 'block';
+    document.getElementById('selSection').scrollIntoView({behavior:'smooth'});
+  })
+  .catch(err => {
+    document.getElementById('cmpLoad').classList.remove('show');
+    document.getElementById('cmpSearchBtn').disabled = false;
+    document.getElementById('cmpSearchBtn').textContent = '🔍 Search';
+    alert('Search failed. Please try again!');
+  });
+}
+
+function renderSelGrid() {
+  const grid = document.getElementById('selGrid');
+  grid.innerHTML = '';
+  allItems.slice(0, 12).forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'sel-card';
+    div.onclick = () => toggleSel(i, div);
+    const color = item.platform_color || '#ff6a00';
+    const price = item.price || item.salary || item.amount || '';
+    div.innerHTML = `
+      <div class="sc-plat" style="background:${color}18;color:${color};border:1px solid ${color}33">
+        ${item.platform_logo || '🔍'} ${item.platform || ''}
+      </div>
+      <div class="sc-title">${item.title || 'Result'}</div>
+      ${price ? `<div class="sc-price">${price}</div>` : ''}
+      <div class="sc-meta">${item.location || item.students || item.duration || item.genre || ''}</div>`;
+    grid.appendChild(div);
+  });
+  updateSelCount();
+}
+
+function toggleSel(idx, el) {
+  const already = selItems.findIndex(s => s.idx === idx);
+  if (already !== -1) {
+    selItems.splice(already, 1);
+    el.classList.remove('chosen');
+  } else {
+    if (selItems.length >= 4) { alert('Max 4 items!'); return; }
+    selItems.push({idx, item: allItems[idx]});
+    el.classList.add('chosen');
+  }
+  updateSelCount();
+  const btn = document.getElementById('cmpGoBtn');
+  selItems.length >= 2 ? btn.classList.add('show') : btn.classList.remove('show');
+}
+
+function updateSelCount() {
+  document.getElementById('selCount').innerHTML = `Selected: <b>${selItems.length} / 4</b> ${selItems.length >= 2 ? '✅ Ready to compare!' : '(need at least 2)'}`;
+}
+
+function buildComparison() {
+  if (selItems.length < 2) { alert('Select at least 2 items!'); return; }
+  const items = selItems.map(s => s.item);
+  document.getElementById('cmpResult').classList.add('show');
+  document.getElementById('cmpResult').scrollIntoView({behavior:'smooth'});
+  buildTable(items);
+  buildVerdict(items);
+  buildCharts(items);
+}
+
+function getVal(item, ...keys) {
+  for (const k of keys) {
+    if (item[k] !== undefined && item[k] !== null && item[k] !== '') return item[k];
+  }
+  return '—';
+}
+
+function getPriceNum(item) {
+  const ps = String(item.price || item.amount || item.salary || '');
+  const m  = ps.replace(/[₹,\s]/g,'').match(/\d+/);
+  return m ? parseFloat(m[0]) : null;
+}
+
+function getRatingNum(item) {
+  const rs = String(item.rating || '');
+  const m  = rs.match(/[\d.]+/);
+  return m ? parseFloat(m[0]) : null;
+}
+
+function buildTable(items) {
+  // Row definitions per category
+  const rowDefs = {
+    courses: [
+      {label:'Platform',  fn: r => r.platform || '—'},
+      {label:'Price',     fn: r => r.price || '—', isPrice:true},
+      {label:'Rating',    fn: r => r.rating ? `⭐ ${r.rating}` : '—'},
+      {label:'Duration',  fn: r => r.duration || '—'},
+      {label:'Level',     fn: r => r.level || '—'},
+      {label:'Students',  fn: r => r.students || '—'},
+      {label:'Certificate',fn:r => r.certificate || '—'},
+      {label:'Instructor',fn: r => r.instructor || '—'},
+    ],
+    jobs: [
+      {label:'Platform',  fn: r => r.platform || '—'},
+      {label:'Company',   fn: r => r.company || '—'},
+      {label:'Salary',    fn: r => r.salary || '—', isPrice:true},
+      {label:'Location',  fn: r => r.location || '—'},
+      {label:'Experience',fn: r => r.experience || '—'},
+      {label:'Job Type',  fn: r => r.job_type || '—'},
+      {label:'Posted',    fn: r => r.posted || '—'},
+    ],
+    shopping: [
+      {label:'Platform',       fn: r => r.platform || '—'},
+      {label:'Price',          fn: r => r.price || '—', isPrice:true},
+      {label:'Original Price', fn: r => r.original_price || '—'},
+      {label:'Discount',       fn: r => r.discount || '—'},
+      {label:'Rating',         fn: r => r.rating ? `⭐ ${r.rating}` : '—'},
+      {label:'Reviews',        fn: r => r.reviews || '—'},
+      {label:'Brand',          fn: r => r.brand || '—'},
+      {label:'Delivery',       fn: r => r.delivery || '—'},
+      {label:'In Stock',       fn: r => r.in_stock || '—'},
+    ],
+    scholarships: [
+      {label:'Platform',    fn: r => r.platform || '—'},
+      {label:'Amount',      fn: r => r.amount || '—', isPrice:true},
+      {label:'Deadline',    fn: r => r.deadline || '—'},
+      {label:'Eligibility', fn: r => r.eligibility || '—'},
+      {label:'Provider',    fn: r => r.provider || '—'},
+      {label:'Category',    fn: r => r.category || '—'},
+    ],
+    coding: [
+      {label:'Platform',   fn: r => r.platform || '—'},
+      {label:'Difficulty', fn: r => r.difficulty || '—'},
+      {label:'Problems',   fn: r => r.problems || '—'},
+      {label:'Topics',     fn: r => r.topics || '—'},
+      {label:'Free?',      fn: r => r.is_free || '—'},
+      {label:'Acceptance', fn: r => r.acceptance || '—'},
+    ],
+    entertainment: [
+      {label:'Platform',     fn: r => r.platform || '—'},
+      {label:'Rating',       fn: r => r.rating || '—'},
+      {label:'Genre',        fn: r => r.genre || '—'},
+      {label:'Language',     fn: r => r.language || '—'},
+      {label:'Year',         fn: r => r.year || '—'},
+      {label:'Type',         fn: r => r.content_type || '—'},
+      {label:'Subscription', fn: r => r.subscription || '—'},
+    ],
+  };
+
+  const rows = rowDefs[cmpCat] || rowDefs['courses'];
+  const tbl  = document.getElementById('cmpTable');
+  tbl.innerHTML = '';
+
+  // Find best values for highlighting
+  const prices  = items.map(r => getPriceNum(r));
+  const ratings = items.map(r => getRatingNum(r));
+  const minPrice  = Math.min(...prices.filter(p => p !== null));
+  const maxRating = Math.max(...ratings.filter(r => r !== null));
+
+  // Header row
+  let thead = '<thead><tr><th class="row-label">Feature</th>';
+  items.forEach(item => {
+    thead += `<th class="item-head">
+      <div style="font-size:13px;margin-bottom:4px">${item.platform_logo || '🔍'} ${item.platform || ''}</div>
+      <div style="font-size:12px;color:var(--text);font-weight:600;white-space:normal;max-width:140px;margin:0 auto">${(item.title||'').substring(0,40)}${item.title&&item.title.length>40?'...':''}</div>
+    </th>`;
+  });
+  thead += '</tr></thead>';
+  tbl.innerHTML = thead;
+
+  // Body rows
+  const tbody = document.createElement('tbody');
+  rows.forEach(row => {
+    const tr = document.createElement('tr');
+    let html = `<td class="row-label">${row.label}</td>`;
+    items.forEach((item, i) => {
+      const val = row.fn(item);
+      let cls = '';
+      if (row.isPrice) {
+        const pn = getPriceNum(item);
+        if (pn !== null && pn === minPrice && prices.filter(p=>p!==null).length > 1) cls = 'badge-green';
+      }
+      if (row.label === 'Rating') {
+        const rn = getRatingNum(item);
+        if (rn !== null && rn === maxRating && ratings.filter(r=>r!==null).length > 1) cls = 'badge-gold';
+      }
+      html += `<td>${cls ? `<span class="badge ${cls}">${val}</span>` : val}</td>`;
+    });
+    tr.innerHTML = html;
+    tbody.appendChild(tr);
+  });
+
+  // Apply link row
+  const linkTr = document.createElement('tr');
+  let lHtml = `<td class="row-label">Apply / View</td>`;
+  items.forEach(item => {
+    lHtml += `<td><a href="${item.url || '#'}" target="_blank" style="padding:6px 14px;background:linear-gradient(135deg,var(--pri),var(--sec));border-radius:7px;color:#fff;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap">Open →</a></td>`;
+  });
+  linkTr.innerHTML = lHtml;
+  tbody.appendChild(linkTr);
+  tbl.appendChild(tbody);
+}
+
+function buildVerdict(items) {
+  const prices  = items.map(r => ({item:r, num: getPriceNum(r)})).filter(x => x.num !== null);
+  const ratings = items.map(r => ({item:r, num: getRatingNum(r)})).filter(x => x.num !== null);
+
+  const bestRated  = ratings.length ? ratings.reduce((a,b) => a.num >= b.num ? a : b).item : items[0];
+  const bestValue  = prices.length  ? prices.reduce((a,b)  => a.num <= b.num ? a : b).item  : items[0];
+  const ourPick    = bestRated;
+
+  document.getElementById('verdictGrid').innerHTML = `
+    <div class="vcard">
+      <div class="vcard-icon">⭐</div>
+      <div class="vcard-label">Highest Rated</div>
+      <div class="vcard-name">${bestRated.platform || ''}</div>
+      <div class="vcard-reason">${bestRated.title ? bestRated.title.substring(0,40)+'...' : ''}</div>
+    </div>
+    <div class="vcard">
+      <div class="vcard-icon">💰</div>
+      <div class="vcard-label">Best Value</div>
+      <div class="vcard-name">${bestValue.platform || ''}</div>
+      <div class="vcard-reason">${bestValue.price || bestValue.salary || bestValue.amount || 'Lowest price'}</div>
+    </div>
+    <div class="vcard" style="border-color:rgba(255,215,0,.25);background:rgba(255,215,0,.05)">
+      <div class="vcard-icon">🏆</div>
+      <div class="vcard-label">Our Pick</div>
+      <div class="vcard-name" style="color:var(--gold)">${ourPick.platform || ''}</div>
+      <div class="vcard-reason">Best overall choice</div>
+    </div>`;
+}
+
+function buildCharts(items) {
+  const colors = items.map(r => r.platform_color || '#ff6a00');
+  const labels = items.map(r => (r.platform || 'Item').substring(0,12));
+
+  // Rating chart
+  const ratings = items.map(r => getRatingNum(r) || 0);
+  if (ratingInst) ratingInst.destroy();
+  ratingInst = new Chart(document.getElementById('ratingChart').getContext('2d'), {
+    type: 'bar',
+    data: { labels, datasets: [{ data:ratings, backgroundColor: colors.map(c=>c+'cc'), borderColor:colors, borderWidth:2, borderRadius:6 }] },
+    options: { responsive:true, maintainAspectRatio:false, scales:{ y:{min:0,max:5,ticks:{color:'#8a6a50'},grid:{color:'rgba(255,106,0,0.05)'}}, x:{ticks:{color:'#8a6a50'},grid:{display:false}} }, plugins:{legend:{display:false}} }
+  });
+
+  // Price chart
+  const prices = items.map(r => getPriceNum(r) || 0);
+  if (priceInst) priceInst.destroy();
+  priceInst = new Chart(document.getElementById('priceChart').getContext('2d'), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data:prices, backgroundColor: colors.map(c=>c+'cc'), borderColor:colors, borderWidth:2 }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#8a6a50', font:{size:11} } } } }
+  });
+}
+
+function resetCompare() {
+  selItems = [];
+  allItems = [];
+  document.getElementById('selSection').style.display = 'none';
+  document.getElementById('cmpResult').classList.remove('show');
+  document.getElementById('cmpIn').value = '';
+  document.getElementById('cmpGoBtn').classList.remove('show');
+  document.getElementById('cmpIn').focus();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// Load items from sessionStorage if coming from category page
+window.onload = () => {
+  const stored = sessionStorage.getItem('compareItems');
+  if (stored) {
+    try {
+      const items = JSON.parse(stored);
+      sessionStorage.removeItem('compareItems');
+      if (items.length >= 2) {
+        selItems = items.map((item,i) => ({idx:i, item}));
+        allItems = items;
+        document.getElementById('selSection').style.display = 'block';
+        renderSelGrid();
+        selItems.forEach(s => {
+          const cards = document.querySelectorAll('.sel-card');
+          if (cards[s.idx]) cards[s.idx].classList.add('chosen');
+        });
+        document.getElementById('cmpGoBtn').classList.add('show');
+        updateSelCount();
+        buildComparison();
+      }
+    } catch(e) {}
+  }
+  document.getElementById('cmpIn').focus();
+};
+</script>
+</body>
+</html>

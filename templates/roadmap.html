@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusSearch – Career Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--pri:#ff6a00;--sec:#cc2200;--gold:#ff9c40;--bg:#0a0500;--surface:rgba(255,106,0,0.05);--border:rgba(255,106,0,0.15);--text:#f5e6d8;--muted:#8a6a50}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden}
+.grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,106,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,106,0,0.03) 1px,transparent 1px);background-size:80px 80px}
+nav{position:sticky;top:0;z-index:100;padding:13px 28px;background:rgba(10,5,0,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.nl{display:flex;align-items:center;gap:18px}
+.nb{display:flex;align-items:center;gap:9px;text-decoration:none}
+.ni{width:30px;height:30px;background:linear-gradient(135deg,var(--pri),var(--sec));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.nn{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;color:var(--pri);letter-spacing:2px}
+.nr{display:flex;gap:9px}
+.btn-bk{padding:6px 13px;background:rgba(255,106,0,.07);border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:12px;text-decoration:none;transition:all .2s}
+.btn-bk:hover{border-color:var(--pri);color:var(--pri)}
+.btn-lo{padding:6px 13px;background:rgba(204,34,0,.1);border:1px solid rgba(204,34,0,.28);border-radius:7px;color:#ff8866;font-size:12px;text-decoration:none;transition:all .2s}
+
+main{max-width:1100px;margin:0 auto;padding:44px 36px;position:relative;z-index:1}
+
+/* HERO SECTION */
+.page-hero{text-align:center;margin-bottom:44px}
+.ph-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 16px;background:rgba(255,156,64,.1);border:1px solid rgba(255,156,64,.3);border-radius:50px;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:18px}
+.ph-title{font-family:'Orbitron',monospace;font-size:36px;font-weight:900;line-height:1.15;margin-bottom:14px}
+.ph-title em{font-style:normal;background:linear-gradient(135deg,var(--pri),var(--sec));background-clip:text;-webkit-text-fill-color:transparent}
+.ph-sub{font-size:15px;color:var(--muted);max-width:600px;margin:0 auto;line-height:1.6}
+.ph-vs{margin-top:12px;font-size:12px;color:var(--muted)}
+.ph-vs span{color:var(--gold);font-weight:600}
+
+/* SEARCH BOX */
+.rm-search{background:linear-gradient(135deg,rgba(255,106,0,.08),rgba(204,34,0,.06));border:1px solid var(--border);border-radius:18px;padding:30px 34px;margin-bottom:36px}
+.rm-sl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.rm-row{display:flex;gap:10px;margin-bottom:14px}
+.rm-in{flex:1;background:rgba(255,106,0,.06);border:1px solid var(--border);border-radius:11px;padding:14px 20px;color:var(--text);font-size:15px;font-family:'Inter',sans-serif;outline:none;transition:all .3s}
+.rm-in:focus{border-color:var(--pri);background:rgba(255,106,0,.1);box-shadow:0 0 0 3px rgba(255,106,0,.12)}
+.rm-in::placeholder{color:var(--muted)}
+.rm-btn{padding:14px 28px;background:linear-gradient(135deg,var(--pri),var(--sec));border:none;border-radius:11px;color:#fff;font-weight:700;font-size:14px;font-family:'Rajdhani',sans-serif;letter-spacing:1px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.rm-btn:hover{filter:brightness(1.1);transform:translateY(-2px);box-shadow:0 8px 20px rgba(255,106,0,.35)}
+.rm-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.level-row{display:flex;gap:8px;flex-wrap:wrap}
+.lvl-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;align-self:center}
+.lvl-btn{padding:6px 16px;background:rgba(255,106,0,.07);border:1px solid rgba(255,106,0,.18);border-radius:7px;font-size:12px;font-weight:600;color:#c49a7a;cursor:pointer;transition:all .2s}
+.lvl-btn.sel,.lvl-btn:hover{background:rgba(255,106,0,.2);border-color:var(--pri);color:var(--pri)}
+.quick-goals{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.qg-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;align-self:center}
+.qg{padding:5px 13px;background:rgba(255,106,0,.07);border:1px solid rgba(255,106,0,.15);border-radius:6px;font-size:12px;font-weight:600;color:#c49a7a;cursor:pointer;transition:all .2s}
+.qg:hover{background:rgba(255,106,0,.18);border-color:var(--pri);color:var(--text)}
+
+/* LOADING */
+.rm-loading{display:none;text-align:center;padding:50px 0}
+.rm-loading.show{display:block}
+.rm-spin{width:50px;height:50px;border:3px solid rgba(255,106,0,.1);border-top-color:var(--pri);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 18px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rm-lt{font-family:'Orbitron',monospace;font-size:14px;color:var(--muted)}
+.rm-steps-load{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+.rm-sl2{padding:4px 12px;border-radius:20px;font-size:11px;background:rgba(255,106,0,.07);border:1px solid var(--border);color:var(--muted);animation:pu 1.5s ease-in-out infinite}
+.rm-sl2:nth-child(2){animation-delay:.2s}.rm-sl2:nth-child(3){animation-delay:.4s}.rm-sl2:nth-child(4){animation-delay:.6s}
+@keyframes pu{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* ROADMAP RESULT */
+#rmResult{display:none}
+#rmResult.show{display:block}
+
+/* OVERVIEW CARDS */
+.rm-overview{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px;animation:ci .5s ease}
+@keyframes ci{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.ov-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;text-align:center}
+.ov-icon{font-size:28px;margin-bottom:8px}
+.ov-val{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:var(--pri)}
+.ov-lbl{font-size:11px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+
+/* PHASE TIMELINE */
+.timeline{position:relative;margin-bottom:36px}
+.timeline::before{content:'';position:absolute;left:28px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--pri),var(--sec));opacity:.3}
+.phase{display:flex;gap:22px;margin-bottom:28px;animation:ci .5s ease both}
+.phase:nth-child(1){animation-delay:.1s}.phase:nth-child(2){animation-delay:.2s}.phase:nth-child(3){animation-delay:.3s}.phase:nth-child(4){animation-delay:.4s}.phase:nth-child(5){animation-delay:.5s}
+.phase-num{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:18px;font-weight:900;flex-shrink:0;position:relative;z-index:1;box-shadow:0 0 20px rgba(255,106,0,.2)}
+.phase-body{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;transition:border-color .2s}
+.phase-body:hover{border-color:var(--pri)}
+.phase-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.phase-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;letter-spacing:.3px}
+.phase-dur{padding:4px 12px;background:rgba(255,106,0,.1);border:1px solid rgba(255,106,0,.2);border-radius:6px;font-size:11px;font-weight:600;color:var(--pri)}
+.skills-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.skill-tag{padding:4px 10px;background:rgba(255,106,0,.08);border:1px solid rgba(255,106,0,.15);border-radius:6px;font-size:11px;font-weight:600;color:#c49a7a}
+.phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pg-section{background:rgba(255,106,0,.03);border:1px solid rgba(255,106,0,.1);border-radius:10px;padding:14px}
+.pg-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.course-item{display:flex;flex-direction:column;gap:3px;padding:10px 12px;background:rgba(255,106,0,.04);border:1px solid transparent;border-radius:8px;transition:all .2s;margin-bottom:7px;text-decoration:none}
+.course-item:hover{background:rgba(255,106,0,.1);border-color:var(--border)}
+.ci-top{display:flex;align-items:center;justify-content:space-between}
+.ci-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
+.ci-plat{font-size:10px;font-weight:700;color:var(--pri)}
+.ci-meta{display:flex;gap:8px;margin-top:3px}
+.ci-price{font-size:10px;font-weight:600;color:#ffd0a0}
+.ci-stars{font-size:10px;color:#f59e0b}
+.prac-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,106,0,.04);border-radius:7px;text-decoration:none;margin-bottom:6px;transition:all .2s;border:1px solid transparent}
+.prac-item:hover{background:rgba(255,106,0,.1);border-color:var(--border)}
+.prac-dot{width:6px;height:6px;border-radius:50%;background:var(--sec);flex-shrink:0}
+.prac-name{font-size:12px;font-weight:600;color:var(--text)}
+.prac-plat{font-size:10px;color:var(--muted);margin-left:auto}
+
+/* BOTTOM: SCHOLARSHIPS + COMPANIES */
+.rm-bottom{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
+.rb-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px}
+.rb-title{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.sch-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,106,0,.04);border-radius:8px;text-decoration:none;margin-bottom:8px;transition:all .2s;border:1px solid transparent}
+.sch-item:hover{background:rgba(255,106,0,.1);border-color:var(--border)}
+.sch-name{font-size:12px;font-weight:600;color:var(--text)}
+.sch-amt{font-size:11px;font-weight:700;color:#ffd0a0;background:rgba(255,156,64,.1);padding:3px 9px;border-radius:5px}
+.comp-list{display:flex;flex-wrap:wrap;gap:8px}
+.comp-tag{padding:7px 14px;background:rgba(255,106,0,.08);border:1px solid rgba(255,106,0,.18);border-radius:8px;font-size:12px;font-weight:600;color:#c49a7a}
+
+/* RESET BTN */
+.reset-btn{display:flex;justify-content:center;margin-bottom:20px}
+.rb2{padding:10px 24px;background:rgba(255,106,0,.1);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s}
+.rb2:hover{border-color:var(--pri);color:var(--pri)}
+@media(max-width:900px){.rm-overview{grid-template-columns:repeat(2,1fr)}.phase-grid{grid-template-columns:1fr}.rm-bottom{grid-template-columns:1fr}}
+@media(max-width:600px){main{padding:20px 16px}.rm-row{flex-direction:column}.ph-title{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="grid"></div>
+<nav>
+  <div class="nl">
+    <a href="/dashboard" class="nb"><div class="ni">🔥</div><div class="nn">NEXUS</div></a>
+    <div style="font-size:13px;color:var(--muted)"><span style="color:var(--gold);font-weight:600">🗺️ Career Roadmap</span></div>
+  </div>
+  <div class="nr">
+    <a href="/dashboard" class="btn-bk">← Dashboard</a>
+    <a href="/logout" class="btn-lo">⏻ Logout</a>
+  </div>
+</nav>
+
+<main>
+  <div class="page-hero">
+    <div class="ph-badge">🗺️ Unique Feature #2 — Not available on Google or ChatGPT</div>
+    <h1 class="ph-title">Career <em>Roadmap</em><br>Generator</h1>
+    <p class="ph-sub">Type your dream career and instantly get a complete step-by-step learning path with real, clickable course links, job portals, and scholarships.</p>
+    <p class="ph-vs">🆚 ChatGPT gives static text · <span>We give live, clickable roadmaps</span></p>
+  </div>
+
+  <div class="rm-search">
+    <div class="rm-sl">Your Dream Career / Goal</div>
+    <div class="rm-row">
+      <input type="text" class="rm-in" id="rmIn" placeholder="e.g. Data Scientist, Web Developer, Python Developer..." onkeypress="if(event.key==='Enter')genRM()">
+      <button class="rm-btn" id="rmBtn" onclick="genRM()">🗺️ GENERATE ROADMAP</button>
+    </div>
+    <div class="level-row" style="margin-bottom:12px">
+      <div class="lvl-lbl">Level:</div>
+      <div class="lvl-btn sel" onclick="setLvl('beginner',this)">Beginner</div>
+      <div class="lvl-btn" onclick="setLvl('intermediate',this)">Intermediate</div>
+      <div class="lvl-btn" onclick="setLvl('advanced',this)">Advanced</div>
+    </div>
+    <div class="quick-goals">
+      <div class="qg-lbl">Quick:</div>
+      <div class="qg" onclick="setGoal('Data Scientist')">📊 Data Scientist</div>
+      <div class="qg" onclick="setGoal('Web Developer')">🌐 Web Developer</div>
+      <div class="qg" onclick="setGoal('Python Developer')">🐍 Python Developer</div>
+      <div class="qg" onclick="setGoal('Machine Learning Engineer')">🤖 ML Engineer</div>
+      <div class="qg" onclick="setGoal('UI/UX Designer')">🎨 UI/UX Designer</div>
+      <div class="qg" onclick="setGoal('Cyber Security')">🔐 Cyber Security</div>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="rm-loading" id="rmLoad">
+    <div class="rm-spin"></div>
+    <div class="rm-lt">BUILDING YOUR ROADMAP...</div>
+    <div class="rm-steps-load">
+      <span class="rm-sl2">📚 Finding Courses</span>
+      <span class="rm-sl2">💼 Searching Jobs</span>
+      <span class="rm-sl2">🏆 Finding Scholarships</span>
+      <span class="rm-sl2">🗺️ Building Path</span>
+    </div>
+  </div>
+
+  <!-- ROADMAP RESULT -->
+  <div id="rmResult">
+    <div class="rm-overview" id="rmOverview"></div>
+    <div class="timeline" id="rmTimeline"></div>
+    <div class="rm-bottom" id="rmBottom"></div>
+    <div class="reset-btn"><button class="rb2" onclick="resetRM()">🔄 Generate New Roadmap</button></div>
+  </div>
+</main>
+
+<script>
+let selLevel='beginner';
+function setLvl(l,el){selLevel=l;document.querySelectorAll('.lvl-btn').forEach(b=>b.classList.remove('sel'));el.classList.add('sel')}
+function setGoal(g){document.getElementById('rmIn').value=g;document.getElementById('rmIn').focus()}
+
+function genRM(){
+  const goal=document.getElementById('rmIn').value.trim();
+  if(!goal)return document.getElementById('rmIn').focus();
+  document.getElementById('rmLoad').classList.add('show');
+  document.getElementById('rmResult').classList.remove('show');
+  document.getElementById('rmBtn').disabled=true;document.getElementById('rmBtn').textContent='⏳ Building...';
+  fetch('/api/roadmap',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({goal,level:selLevel})})
+  .then(r=>r.json()).then(data=>{
+    document.getElementById('rmLoad').classList.remove('show');
+    document.getElementById('rmBtn').disabled=false;document.getElementById('rmBtn').textContent='🗺️ GENERATE ROADMAP';
+    if(data.roadmap){renderRM(data.roadmap,data.goal)}
+  }).catch(()=>{
+    document.getElementById('rmLoad').classList.remove('show');
+    document.getElementById('rmBtn').disabled=false;document.getElementById('rmBtn').textContent='🗺️ GENERATE ROADMAP';
+  });
+}
+
+function renderRM(rm,goal){
+  document.getElementById('rmResult').classList.add('show');
+  document.getElementById('rmResult').scrollIntoView({behavior:'smooth',block:'start'});
+  // Overview
+  document.getElementById('rmOverview').innerHTML=`
+    <div class="ov-card"><div class="ov-icon">${rm.emoji||'🎯'}</div><div class="ov-val">${rm.title}</div><div class="ov-lbl">Career Goal</div></div>
+    <div class="ov-card"><div class="ov-icon">⏱️</div><div class="ov-val">${rm.duration}</div><div class="ov-lbl">Estimated Time</div></div>
+    <div class="ov-card"><div class="ov-icon">💰</div><div class="ov-val">${rm.avg_salary}</div><div class="ov-lbl">Avg Salary</div></div>
+    <div class="ov-card"><div class="ov-icon">🏢</div><div class="ov-val">${rm.phases?rm.phases.length:0} Phases</div><div class="ov-lbl">Learning Path</div></div>`;
+  // Timeline
+  let tHTML='';
+  (rm.phases||[]).forEach((ph,i)=>{
+    const clr=ph.color||'#ff6a00';
+    const courses=(ph.courses||[]).map(c=>`
+      <a href="${c.url}" target="_blank" class="course-item">
+        <div class="ci-top"><span class="ci-name">${c.name}</span></div>
+        <div class="ci-meta"><span class="ci-plat">${c.platform}</span><span class="ci-price">${c.price||''}</span><span class="ci-stars">${c.rating?'★'.repeat(Math.round(c.rating)):''} ${c.rating||''}</span></div>
+      </a>`).join('');
+    const pracs=(ph.practice||[]).map(p=>`
+      <a href="${p.url}" target="_blank" class="prac-item">
+        <div class="prac-dot"></div>
+        <span class="prac-name">${p.name}</span>
+        <span class="prac-plat">${p.platform}</span>
+      </a>`).join('');
+    tHTML+=`
+    <div class="phase">
+      <div class="phase-num" style="background:linear-gradient(135deg,${clr},${clr}99);color:#fff">${ph.phase}</div>
+      <div class="phase-body">
+        <div class="phase-header">
+          <div class="phase-title" style="color:${clr}">${ph.title}</div>
+          <div class="phase-dur">⏱️ ${ph.duration}</div>
+        </div>
+        <div class="skills-row">${(ph.skills||[]).map(s=>`<span class="skill-tag">${s}</span>`).join('')}</div>
+        <div class="phase-grid">
+          ${courses?`<div class="pg-section"><div class="pg-title">📚 Courses & Resources</div>${courses}</div>`:''}
+          ${pracs?`<div class="pg-section"><div class="pg-title">💡 Practice & Apply</div>${pracs}</div>`:''}
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('rmTimeline').innerHTML=tHTML;
+  // Bottom
+  const schHTML=(rm.scholarships||[]).map(s=>`<a href="${s.url}" target="_blank" class="sch-item"><span class="sch-name">${s.name}</span><span class="sch-amt">${s.amount}</span></a>`).join('');
+  const compHTML=(rm.top_companies||[]).map(c=>`<div class="comp-tag">🏢 ${c}</div>`).join('');
+  document.getElementById('rmBottom').innerHTML=`
+    <div class="rb-card"><div class="rb-title">🏆 Scholarships for This Path</div>${schHTML}</div>
+    <div class="rb-card"><div class="rb-title">🏢 Top Hiring Companies</div><div class="comp-list">${compHTML}</div></div>`;
+}
+function resetRM(){
+  document.getElementById('rmResult').classList.remove('show');
+  document.getElementById('rmIn').value='';
+  document.getElementById('rmIn').focus();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('rmIn').focus();
+</script>
+</body>
+</html>

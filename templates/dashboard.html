@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusSearch – Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--pri:#ff6a00;--sec:#cc2200;--gold:#ffd700;--green:#22c55e;--bg:#0a0500;--surface:rgba(255,106,0,0.05);--border:rgba(255,106,0,0.15);--text:#f5e6d8;--muted:#8a6a50}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden}
+.grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,106,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,106,0,0.04) 1px,transparent 1px);background-size:70px 70px}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:200;padding:13px 24px;background:rgba(10,5,0,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.nl{display:flex;align-items:center;gap:14px}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.li{width:32px;height:32px;background:linear-gradient(135deg,var(--pri),var(--sec));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 14px rgba(255,106,0,0.35)}
+.ln{font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:var(--pri);letter-spacing:2px}
+.ai-badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px}
+.ai-on{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#86efac}
+.ai-off{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.25);color:var(--gold)}
+.nr{display:flex;align-items:center;gap:10px}
+.user-greet{font-size:12px;color:var(--muted)}
+.user-greet span{color:var(--text);font-weight:600}
+.btn-lo{padding:7px 14px;background:rgba(204,34,0,.1);border:1px solid rgba(204,34,0,.25);border-radius:8px;color:#ff8866;font-size:12px;text-decoration:none;transition:all .2s}
+.btn-lo:hover{background:rgba(204,34,0,.2)}
+
+/* ── SIDEBAR ── */
+.hamburger{width:38px;height:38px;background:rgba(255,106,0,.08);border:1px solid var(--border);border-radius:9px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:all .2s}
+.hamburger:hover{background:rgba(255,106,0,.15);border-color:var(--pri)}
+.hb{width:18px;height:2px;background:var(--pri);border-radius:2px;transition:all .3s}
+.sidebar{position:fixed;top:0;left:-280px;width:280px;height:100vh;background:rgba(10,5,0,.98);border-right:1px solid var(--border);z-index:300;transition:left .3s ease;backdrop-filter:blur(20px);padding:20px 0}
+.sidebar.open{left:0}
+.sb-head{padding:20px 20px 16px;border-bottom:1px solid var(--border);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.sb-brand{font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:var(--pri)}
+.sb-close{width:28px;height:28px;background:rgba(255,106,0,.08);border:1px solid var(--border);border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px}
+.sb-item{display:flex;align-items:center;gap:12px;padding:12px 20px;text-decoration:none;color:var(--muted);font-size:14px;font-weight:500;transition:all .2s;border-left:3px solid transparent}
+.sb-item:hover{background:rgba(255,106,0,.06);color:var(--text);border-left-color:var(--pri)}
+.sb-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:10px 20px 4px;opacity:.6}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:250;display:none;backdrop-filter:blur(3px)}
+.overlay.show{display:block}
+
+main{max-width:1200px;margin:0 auto;padding:28px 24px;position:relative;z-index:1}
+
+/* ── HERO ── */
+.hero{text-align:center;margin-bottom:36px}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 16px;background:rgba(255,106,0,.1);border:1px solid rgba(255,106,0,.2);border-radius:50px;font-size:11px;font-weight:700;color:var(--pri);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
+.hero-title{font-family:'Orbitron',monospace;font-size:36px;font-weight:900;line-height:1.15;margin-bottom:12px}
+.hero-title em{font-style:normal;background:linear-gradient(135deg,var(--gold),var(--pri));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:15px;color:var(--muted);max-width:540px;margin:0 auto;line-height:1.6}
+
+/* ── MAIN SEARCH ── */
+.main-search{background:linear-gradient(135deg,rgba(255,106,0,.07),rgba(204,34,0,.05));border:1.5px solid rgba(255,106,0,.2);border-radius:20px;padding:28px 32px;margin-bottom:32px}
+.ms-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.ms-row{display:flex;gap:10px;margin-bottom:14px}
+.ms-in{flex:1;background:rgba(255,106,0,.06);border:1.5px solid var(--border);border-radius:12px;padding:14px 20px;color:var(--text);font-size:15px;font-family:'Inter',sans-serif;outline:none;transition:all .3s}
+.ms-in:focus{border-color:var(--pri);background:rgba(255,106,0,.09);box-shadow:0 0 0 3px rgba(255,106,0,.1)}
+.ms-in::placeholder{color:var(--muted)}
+.ms-btn{padding:14px 28px;background:linear-gradient(135deg,var(--pri),var(--sec));border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;font-family:'Rajdhani',sans-serif;letter-spacing:1px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.ms-btn:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 6px 18px rgba(255,106,0,.35)}
+.ms-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+/* Category selector */
+.cat-row{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.cat-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;align-self:center}
+.cat-btn{padding:7px 14px;background:rgba(255,106,0,.07);border:1px solid rgba(255,106,0,.15);border-radius:8px;font-size:12px;font-weight:600;color:#c49a7a;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px}
+.cat-btn:hover,.cat-btn.sel{background:rgba(255,106,0,.15);border-color:var(--pri);color:var(--text)}
+/* Budget row */
+.budget-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.bgt-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.bgt-in{background:rgba(255,106,0,.06);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;width:130px;transition:all .3s}
+.bgt-in:focus{border-color:var(--pri)}
+.bgt-in::placeholder{color:var(--muted)}
+.bq{padding:6px 12px;background:rgba(255,106,0,.07);border:1px solid rgba(255,106,0,.12);border-radius:7px;font-size:11px;font-weight:600;color:#c49a7a;cursor:pointer;transition:all .2s}
+.bq:hover,.bq.sel{background:rgba(255,215,0,.12);border-color:var(--gold);color:var(--gold)}
+
+/* ── STATUS ── */
+.status-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.res-count{font-size:13px;color:var(--muted)}
+.res-count b{color:var(--pri)}
+.ai-res-tag{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700}
+.tag-ai{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:#86efac}
+.tag-sc{background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);color:var(--gold)}
+
+/* ── LOADING ── */
+.loading{display:none;text-align:center;padding:50px}
+.loading.show{display:block}
+.spin{width:46px;height:46px;border:3px solid rgba(255,106,0,.1);border-top-color:var(--pri);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-txt{font-family:'Orbitron',monospace;font-size:12px;color:var(--muted)}
+
+/* ── NO RESULTS ── */
+.no-res{display:none;text-align:center;padding:50px 20px}
+.no-res.show{display:block}
+.nr-ic{font-size:52px;margin-bottom:12px;opacity:.4}
+.nr-t{font-family:'Orbitron',monospace;font-size:16px;color:var(--muted);margin-bottom:8px}
+.nr-s{font-size:13px;color:var(--muted);opacity:.7;max-width:380px;margin:0 auto;line-height:1.6}
+.nr-btn{margin-top:14px;padding:9px 20px;background:linear-gradient(135deg,var(--pri),var(--sec));border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:600;font-family:'Rajdhani',sans-serif;cursor:pointer}
+
+/* ── RESULTS GRID ── */
+.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:15px;margin-bottom:28px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:17px;transition:all .3s;text-decoration:none;display:block;color:var(--text);animation:fu .4s ease both;position:relative;overflow:hidden}
+.card:hover{border-color:var(--pri);transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.4)}
+@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.plat{display:flex;align-items:center;gap:5px;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700}
+.crating{font-size:12px;font-weight:600;color:var(--gold)}
+.ctitle{font-size:13px;font-weight:600;line-height:1.4;margin-bottom:7px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cdesc{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cmeta{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.tag{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(255,106,0,.08);color:#c49a7a;border:1px solid rgba(255,106,0,.12)}
+.tag-g{background:rgba(34,197,94,.08);color:#86efac;border-color:rgba(34,197,94,.15)}
+.tag-gold{background:rgba(255,215,0,.08);color:var(--gold);border-color:rgba(255,215,0,.15)}
+.tag-r{background:rgba(239,68,68,.08);color:#fca5a5;border-color:rgba(239,68,68,.15)}
+.cprice{font-family:'Orbitron',monospace;font-size:17px;font-weight:900;color:var(--pri);margin-bottom:8px}
+.cprice-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.corig{font-size:11px;color:var(--muted);text-decoration:line-through}
+.cdisc{padding:2px 6px;background:rgba(34,197,94,.1);border-radius:4px;font-size:10px;font-weight:700;color:#86efac}
+.cfoot{display:flex;align-items:center;justify-content:space-between;padding-top:9px;border-top:1px solid rgba(255,106,0,.07)}
+.clink{font-size:11px;font-weight:600;color:var(--pri)}
+.cdel{font-size:10px;color:var(--muted)}
+.budget-ok{position:absolute;top:10px;right:10px;padding:2px 7px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);border-radius:4px;font-size:9px;font-weight:700;color:#86efac}
+.budget-over{position:absolute;top:10px;right:10px;padding:2px 7px;background:rgba(255,106,0,.1);border:1px solid rgba(255,106,0,.2);border-radius:4px;font-size:9px;color:#c49a7a}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;transition:all .3s}
+.stat:hover{border-color:var(--pri);transform:translateY(-2px)}
+.stat-n{font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--pri)}
+.stat-l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.stat-i{font-size:24px;margin-bottom:6px}
+
+/* ── FEATURES ── */
+.feat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px}
+.feat{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;transition:all .3s}
+.feat:hover{border-color:var(--pri)}
+.feat-icon{font-size:32px;margin-bottom:12px}
+.feat-title{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px}
+.feat-desc{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* ── CATEGORIES ── */
+.sec-title{font-family:'Orbitron',monospace;font-size:18px;font-weight:700;color:var(--text);margin-bottom:18px}
+.sec-title span{color:var(--pri)}
+.cats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px}
+.cat-card{display:block;text-decoration:none;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;transition:all .3s;text-align:center}
+.cat-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.4)}
+.cc-icon{font-size:34px;margin-bottom:10px}
+.cc-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:5px}
+.cc-desc{font-size:11px;color:var(--muted);line-height:1.5}
+.cc-tags{display:flex;justify-content:center;flex-wrap:wrap;gap:4px;margin-top:10px}
+.cc-tag{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(255,106,0,.08);color:var(--pri);border:1px solid rgba(255,106,0,.15)}
+
+/* ── CHARTS ── */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
+.ct{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px}
+.ct span{color:var(--pri)}
+.cw{position:relative;height:180px}
+
+footer{border-top:1px solid var(--border);padding:18px 24px;text-align:center;color:var(--muted);font-size:12px;position:relative;z-index:1;margin-top:40px}
+footer span{color:var(--pri)}
+
+@media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr)}.feat-row{grid-template-columns:1fr}.cats-grid{grid-template-columns:repeat(2,1fr)}.charts-row{grid-template-columns:1fr}}
+@media(max-width:600px){.cats-grid{grid-template-columns:1fr}.ms-row{flex-direction:column}main{padding:18px 14px}.hero-title{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="grid"></div>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <div class="sb-brand">🔥 NEXUSSEARCH</div>
+    <div class="sb-close" onclick="closeSidebar()">✕</div>
+  </div>
+  <div class="sb-label">Navigation</div>
+  <a href="/dashboard" class="sb-item">🏠 Dashboard</a>
+  <a href="/roadmap" class="sb-item">🗺️ Career Roadmap</a>
+  <a href="/compare" class="sb-item">⚖️ Compare Tool</a>
+  <div class="sb-label">Categories</div>
+  <a href="/category/courses" class="sb-item">🎓 Online Courses</a>
+  <a href="/category/jobs" class="sb-item">💼 Job Portal</a>
+  <a href="/category/shopping" class="sb-item">🛒 Smart Shopping</a>
+  <a href="/category/scholarships" class="sb-item">🏆 Scholarships</a>
+  <a href="/category/coding" class="sb-item">💻 Coding Practice</a>
+  <a href="/category/entertainment" class="sb-item">🎬 Entertainment</a>
+  <div class="sb-label">Account</div>
+  <a href="/admin?key=nexusadmin2024" class="sb-item">👑 Admin Panel</a>
+  <a href="/logout" class="sb-item">⏻ Logout</a>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nl">
+    <div class="hamburger" onclick="openSidebar()">
+      <div class="hb"></div><div class="hb"></div><div class="hb"></div>
+    </div>
+    <a href="/dashboard" class="logo">
+      <div class="li">🔥</div>
+      <div class="ln">NEXUSSEARCH</div>
+    </a>
+    {% if ai_ready %}
+    <span class="ai-badge ai-on">✨ AI ON</span>
+    {% else %}
+    <span class="ai-badge ai-off">⚡ Smart Search</span>
+    {% endif %}
+  </div>
+  <div class="nr">
+    <div class="user-greet">Hello, <span>{{ user_name or 'User' }}</span>!</div>
+    <a href="/logout" class="btn-lo">⏻ Logout</a>
+  </div>
+</nav>
+
+<main>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">🔥 Intelligent Multi-Platform Search</div>
+    <h1 class="hero-title">Search Smarter<br>Find <em>Everything</em></h1>
+    <p class="hero-sub">Search across 50+ platforms simultaneously — courses, jobs, shopping, scholarships, coding and entertainment in one place.</p>
+  </div>
+
+  <!-- MAIN SEARCH BOX -->
+  <div class="main-search">
+    <div class="ms-label">🔍 Search Category</div>
+    <div class="cat-row">
+      <div class="cat-lbl">Category:</div>
+      <div class="cat-btn sel" onclick="setCat('courses',this)">🎓 Courses</div>
+      <div class="cat-btn" onclick="setCat('jobs',this)">💼 Jobs</div>
+      <div class="cat-btn" onclick="setCat('shopping',this)">🛒 Shopping</div>
+      <div class="cat-btn" onclick="setCat('scholarships',this)">🏆 Scholarships</div>
+      <div class="cat-btn" onclick="setCat('coding',this)">💻 Coding</div>
+      <div class="cat-btn" onclick="setCat('entertainment',this)">🎬 Entertainment</div>
+    </div>
+    <div class="ms-row">
+      <input type="text" class="ms-in" id="mainSearch"
+        placeholder="Type your search here... e.g. Python course, Data Analyst job, Samsung mobile..."
+        onkeypress="if(event.key==='Enter')mainDoSearch()">
+      <button class="ms-btn" id="mainBtn" onclick="mainDoSearch()">🔍 SEARCH</button>
+    </div>
+    <!-- Budget row — shown for shopping and courses -->
+    <div class="budget-row" id="budgetRow" style="display:none">
+      <div class="bgt-lbl">💰 MAX BUDGET:</div>
+      <input type="number" class="bgt-in" id="budgetIn" placeholder="e.g. 5000" min="0">
+      <button class="bq" onclick="setBgt(0,this)">Any</button>
+      <button class="bq" onclick="setBgt(500,this)">₹500</button>
+      <button class="bq" onclick="setBgt(1000,this)">₹1000</button>
+      <button class="bq" onclick="setBgt(5000,this)">₹5000</button>
+      <button class="bq" onclick="setBgt(15000,this)">₹15K</button>
+      <button class="bq" onclick="setBgt(30000,this)">₹30K</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading" id="mainLoad">
+    <div class="spin"></div>
+    <div class="load-txt" id="loadTxt">SEARCHING ACROSS ALL PLATFORMS...</div>
+  </div>
+
+  <!-- STATUS -->
+  <div class="status-row" id="statusRow" style="display:none">
+    <div class="res-count" id="resCount"></div>
+    <div id="resTag"></div>
+  </div>
+
+  <!-- NO RESULTS -->
+  <div class="no-res" id="noRes">
+    <div class="nr-ic">🔍</div>
+    <div class="nr-t">No Results Found</div>
+    <div class="nr-s" id="noResMsg">Try different keywords or a different category.</div>
+    <button class="nr-btn" onclick="resetSearch()">Try Again</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="res-grid" id="resGrid"></div>
+
+  <!-- CHARTS (shown after search) -->
+  <div class="charts-row" id="chartsRow" style="display:none">
+    <div class="chart-box">
+      <div class="ct">Platform <span>Distribution</span></div>
+      <div class="cw"><canvas id="pieChart"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <div class="ct">Ratings <span>Overview</span></div>
+      <div class="cw"><canvas id="barChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat"><div class="stat-i">🌐</div><div class="stat-n">50+</div><div class="stat-l">Platforms</div></div>
+    <div class="stat"><div class="stat-i">📂</div><div class="stat-n">6</div><div class="stat-l">Categories</div></div>
+    <div class="stat"><div class="stat-i">⚡</div><div class="stat-n">5s</div><div class="stat-l">Avg Search Time</div></div>
+    <div class="stat"><div class="stat-i">✨</div><div class="stat-n">AI</div><div class="stat-l">Powered</div></div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="sec-title">Our <span>Unique Features</span></div>
+  <div class="feat-row">
+    <div class="feat">
+      <div class="feat-icon">💰</div>
+      <div class="feat-title">Smart Budget Filter</div>
+      <div class="feat-desc">Type "laptop under 30000" and we automatically detect your budget and filter results. Works with natural language!</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🗺️</div>
+      <div class="feat-title">Career Roadmap Generator</div>
+      <div class="feat-desc">Get a complete phase-by-phase career guide with live course links, projects to build, and companies currently hiring!</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">⚖️</div>
+      <div class="feat-title">Side-by-Side Comparison</div>
+      <div class="feat-desc">Select 2-4 results and compare them instantly. Get Smart Verdict showing best rated and best value option!</div>
+    </div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="sec-title">Choose a <span>Category</span></div>
+  <div class="cats-grid">
+    <a href="/category/courses" class="cat-card" style="border-color:rgba(255,106,0,0.25)">
+      <div class="cc-icon">🎓</div>
+      <div class="cc-name">Online Courses</div>
+      <div class="cc-desc">Compare courses from all major platforms with prices & ratings</div>
+      <div class="cc-tags"><span class="cc-tag">Udemy</span><span class="cc-tag">Coursera</span><span class="cc-tag">YouTube</span><span class="cc-tag">+more</span></div>
+    </a>
+    <a href="/category/jobs" class="cat-card" style="border-color:rgba(204,34,0,0.25)">
+      <div class="cc-icon">💼</div>
+      <div class="cc-name">Job Portal</div>
+      <div class="cc-desc">Live hiring from LinkedIn, Indeed, Naukri, Glassdoor & more</div>
+      <div class="cc-tags"><span class="cc-tag">LinkedIn</span><span class="cc-tag">Naukri</span><span class="cc-tag">+more</span></div>
+    </a>
+    <a href="/category/shopping" class="cat-card" style="border-color:rgba(255,156,64,0.25)">
+      <div class="cc-icon">🛒</div>
+      <div class="cc-name">Smart Shopping</div>
+      <div class="cc-desc">Compare prices across Amazon, Flipkart, Myntra & 30+ platforms</div>
+      <div class="cc-tags"><span class="cc-tag">Amazon</span><span class="cc-tag">Flipkart</span><span class="cc-tag">+more</span></div>
+    </a>
+    <a href="/category/scholarships" class="cat-card" style="border-color:rgba(255,119,0,0.25)">
+      <div class="cc-icon">🏆</div>
+      <div class="cc-name">Scholarships</div>
+      <div class="cc-desc">Find scholarships from NSP India, Buddy4Study, AICTE & more</div>
+      <div class="cc-tags"><span class="cc-tag">NSP</span><span class="cc-tag">AICTE</span><span class="cc-tag">+more</span></div>
+    </a>
+    <a href="/category/coding" class="cat-card" style="border-color:rgba(255,68,0,0.25)">
+      <div class="cc-icon">💻</div>
+      <div class="cc-name">Coding Practice</div>
+      <div class="cc-desc">Practice on LeetCode, HackerRank, CodeChef, Codeforces & more</div>
+      <div class="cc-tags"><span class="cc-tag">LeetCode</span><span class="cc-tag">HackerRank</span><span class="cc-tag">+more</span></div>
+    </a>
+    <a href="/category/entertainment" class="cat-card" style="border-color:rgba(224,48,0,0.25)">
+      <div class="cc-icon">🎬</div>
+      <div class="cc-name">Entertainment</div>
+      <div class="cc-desc">Find movies & shows on Netflix, Hotstar, Amazon Prime & more</div>
+      <div class="cc-tags"><span class="cc-tag">Netflix</span><span class="cc-tag">Hotstar</span><span class="cc-tag">+more</span></div>
+    </a>
+  </div>
+
+  <!-- ROADMAP SHORTCUT -->
+  <div style="background:linear-gradient(135deg,rgba(255,215,0,.07),rgba(255,106,0,.05));border:1px solid rgba(255,215,0,.2);border-radius:16px;padding:24px;margin-bottom:32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px">
+    <div>
+      <div style="font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:var(--gold);margin-bottom:5px">🗺️ Career Roadmap Generator</div>
+      <div style="font-size:13px;color:var(--muted)">Get a complete AI-powered roadmap for any career — with live courses, projects and hiring companies!</div>
+    </div>
+    <a href="/roadmap" style="padding:12px 24px;background:linear-gradient(135deg,var(--gold),var(--pri));border:none;border-radius:10px;color:#000;font-size:14px;font-weight:700;font-family:'Rajdhani',sans-serif;text-decoration:none;white-space:nowrap">Generate Roadmap →</a>
+  </div>
+</main>
+
+<footer>🔥 <span>NexusSearch</span> — Intelligent Multi-Platform Search System {% if ai_ready %}· <span>✨ AI Powered by Gemini</span>{% endif %}</footer>
+
+<!-- Config block — safe Jinja2 variables -->
+<script id="nx-cfg" type="application/json">{"ai_ready": {{ 'true' if ai_ready else 'false' }}}</script>
+
+<script>
+const NX = JSON.parse(document.getElementById('nx-cfg').textContent);
+let selCat = 'courses';
+let allRes  = [];
+let pieInst = null, barInst = null;
+
+// ── SIDEBAR ──────────────────────────────────────────────────
+function openSidebar()  { document.getElementById('sidebar').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
+
+// ── CATEGORY SELECT ──────────────────────────────────────────
+function setCat(cat, el) {
+  selCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  // Show budget only for shopping and courses
+  const budRow = document.getElementById('budgetRow');
+  budRow.style.display = (cat === 'shopping' || cat === 'courses') ? 'flex' : 'none';
+  // Update placeholder
+  const hints = {
+    courses: 'e.g. Python programming, Web Development...',
+    jobs: 'e.g. Data Analyst fresher, Software Engineer...',
+    shopping: 'e.g. Samsung mobile, Nike shoes, Laptop...',
+    scholarships: 'e.g. Merit scholarship engineering student...',
+    coding: 'e.g. DSA problems, Dynamic Programming...',
+    entertainment: 'e.g. Action movies Hindi, Sacred Games...'
+  };
+  document.getElementById('mainSearch').placeholder = hints[cat] || 'Type your search...';
+}
+
+function setBgt(val, el) {
+  document.getElementById('budgetIn').value = val || '';
+  document.querySelectorAll('.bq').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function resetSearch() {
+  document.getElementById('mainSearch').value = '';
+  document.getElementById('resGrid').innerHTML = '';
+  document.getElementById('noRes').classList.remove('show');
+  document.getElementById('statusRow').style.display = 'none';
+  document.getElementById('chartsRow').style.display = 'none';
+  document.getElementById('mainSearch').focus();
+}
+
+// ── MAIN SEARCH ──────────────────────────────────────────────
+function mainDoSearch() {
+  const q = document.getElementById('mainSearch').value.trim();
+  if (!q) { document.getElementById('mainSearch').focus(); return; }
+
+  const budgetVal = document.getElementById('budgetIn').value;
+  const budget    = budgetVal && parseFloat(budgetVal) > 0 ? parseFloat(budgetVal) : null;
+
+  // UI reset
+  document.getElementById('mainLoad').classList.add('show');
+  document.getElementById('resGrid').innerHTML = '';
+  document.getElementById('noRes').classList.remove('show');
+  document.getElementById('statusRow').style.display = 'none';
+  document.getElementById('chartsRow').style.display = 'none';
+  document.getElementById('mainBtn').disabled = true;
+  document.getElementById('mainBtn').textContent = '⏳ Searching...';
+  document.getElementById('loadTxt').textContent = NX.ai_ready
+    ? '✨ AI IS SEARCHING ACROSS ALL PLATFORMS...'
+    : '🔍 SEARCHING ACROSS ALL PLATFORMS...';
+
+  fetch('/search', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ query: q, category: selCat, budget: budget })
+  })
+  .then(r => r.json())
+  .then(data => {
+    document.getElementById('mainLoad').classList.remove('show');
+    document.getElementById('mainBtn').disabled = false;
+    document.getElementById('mainBtn').textContent = '🔍 SEARCH';
+
+    let results = data.results || [];
+    console.log('✅ Results received:', results.length, '| AI:', data.ai_used, '| Category:', selCat);
+
+    // ── SMART BUDGET FILTER ──────────────────────────────
+    // ONLY filter if budget set AND we have results with prices
+    if (budget && budget > 0 && results.length > 0) {
+      const within = results.filter(r => {
+        const ps = String(r.price || r.amount || '');
+        const nums = ps.replace(/[₹,\s]/g,'').match(/\d+/);
+        if (!nums) return true; // No price info → always show
+        const n = parseFloat(nums[0]);
+        if (isNaN(n) || n === 0) return true;
+        return n <= budget;
+      });
+      // KEY FIX: Only apply filter if it keeps at least 1 result
+      // Otherwise show ALL results with budget badges
+      if (within.length > 0) {
+        results = within;
+      }
+      // If within is empty → show ALL results anyway (don't hide everything!)
+    }
+
+    allRes = results;
+
+    if (!results || results.length === 0) {
+      document.getElementById('noRes').classList.add('show');
+      let msg = budget
+        ? `No results found for "${q}". Try different keywords.`
+        : `No results found for "${q}". Try different keywords.`;
+      document.getElementById('noResMsg').textContent = msg;
+      return;
+    }
+
+    // Show status bar
+    document.getElementById('statusRow').style.display = 'flex';
+    document.getElementById('resCount').innerHTML = `Found <b>${results.length}</b> results for "<b>${q}</b>"`;
+    document.getElementById('resTag').innerHTML = data.ai_used
+      ? '<div class="ai-res-tag tag-ai">✨ AI Results</div>'
+      : '<div class="ai-res-tag tag-sc">⚡ Smart Search</div>';
+
+    // Render cards
+    renderCards(results, budget);
+
+    // Charts
+    if (results.length >= 2) renderCharts(results);
+  })
+  .catch(err => {
+    console.error('Search error:', err);
+    document.getElementById('mainLoad').classList.remove('show');
+    document.getElementById('mainBtn').disabled = false;
+    document.getElementById('mainBtn').textContent = '🔍 SEARCH';
+    document.getElementById('noRes').classList.add('show');
+    document.getElementById('noResMsg').textContent = 'Connection error. Please check your internet and try again.';
+  });
+}
+
+// ── RENDER CARDS ─────────────────────────────────────────────
+function renderCards(results, budget) {
+  const grid = document.getElementById('resGrid');
+  grid.innerHTML = '';
+
+  results.forEach((r, i) => {
+    const a     = document.createElement('a');
+    a.className = 'card';
+    a.href      = (r.url && r.url !== '#') ? r.url : '#';
+    if (r.url && r.url !== '#') a.target = '_blank';
+    a.style.animationDelay = `${i * 0.05}s`;
+
+    const color = r.platform_color || '#ff6a00';
+    const logo  = r.platform_logo  || '🔍';
+    const plat  = r.platform       || 'Platform';
+    const title = r.title          || 'Result';
+    const desc  = r.description    || '';
+    const type  = r.type           || selCat;
+    const rating= r.rating ? `<div class="crating">⭐ ${r.rating}</div>` : '';
+
+    // Budget badge
+    let budgeBadge = '';
+    if (budget && budget > 0) {
+      const ps   = String(r.price || r.amount || '');
+      const nums = ps.replace(/[₹,\s]/g,'').match(/\d+/);
+      if (nums) {
+        const n = parseFloat(nums[0]);
+        if (!isNaN(n) && n > 0) {
+          budgeBadge = n <= budget
+            ? '<div class="budget-ok">✅ Within Budget</div>'
+            : '<div class="budget-over">↑ Over Budget</div>';
+        }
+      }
+    }
+
+    const header = `<div class="card-head">
+      <div class="plat" style="background:${color}18;color:${color};border:1px solid ${color}33">${logo} ${plat}</div>
+      ${rating}
+    </div>`;
+
+    let body = '';
+
+    if (type === 'course' || selCat === 'courses') {
+      const price = r.price || 'Check';
+      const isFree = price.toLowerCase().includes('free');
+      body = `${header}
+        <div class="ctitle">${title}</div>
+        <div class="cdesc">${desc}</div>
+        <div class="cmeta">
+          <span class="tag ${isFree?'tag-g':''}">${price}</span>
+          ${r.level ? `<span class="tag">${r.level}</span>` : ''}
+          ${r.duration ? `<span class="tag">⏱️ ${r.duration}</span>` : ''}
+          ${r.certificate==='Yes' ? `<span class="tag tag-gold">🏆 Certificate</span>` : ''}
+        </div>
+        <div class="cfoot">
+          <span class="clink">View Course →</span>
+          ${r.students ? `<span class="cdel">👥 ${r.students}</span>` : ''}
+        </div>`;
+
+    } else if (type === 'job' || selCat === 'jobs') {
+      body = `${header}
+        <div class="ctitle">${title}</div>
+        <div class="cdesc">${desc}</div>
+        <div class="cmeta">
+          <span class="tag tag-g">💰 ${r.salary || 'Check'}</span>
+          <span class="tag">📍 ${r.location || 'India'}</span>
+          ${r.experience ? `<span class="tag">${r.experience}</span>` : ''}
+          ${r.job_type ? `<span class="tag">${r.job_type}</span>` : ''}
+        </div>
+        <div class="cfoot"><span class="clink">Apply Now →</span>${r.posted ? `<span class="cdel">${r.posted}</span>` : ''}</div>`;
+
+    } else if (type === 'product' || selCat === 'shopping') {
+      body = `${header}
+        <div class="ctitle">${title}</div>
+        <div class="cdesc">${desc}</div>
+        <div class="cprice-row">
+          <div class="cprice">${r.price || 'Check'}</div>
+          ${r.original_price ? `<div class="corig">${r.original_price}</div>` : ''}
+          ${r.discount ? `<div class="cdisc">${r.discount}</div>` : ''}
+        </div>
+        <div class="cfoot">
+          <span class="clink">View Product →</span>
+          <span class="cdel">${r.delivery || ''}</span>
+        </div>`;
+
+    } else if (type === 'scholarship' || selCat === 'scholarships') {
+      body = `${header}
+        <div class="ctitle">${title}</div>
+        <div class="cdesc">${desc}</div>
+        <div class="cmeta">
+          <span class="tag tag-gold">💰 ${r.amount || 'Check'}</span>
+          <span class="tag tag-r">📅 ${r.deadline || 'Check'}</span>
+        </div>
+        ${r.eligibility ? `<div class="cdesc">📋 ${r.eligibility}</div>` : ''}
+        <div class="cfoot"><span class="clink">Apply Now →</span></div>`;
+
+    } else if (type === 'coding' || selCat === 'coding') {
+      body = `${header}
+        <div class="ctitle">${title}</div>
+        <div class="cdesc">${desc}</div>
+        <div class="cmeta">
+          ${r.difficulty ? `<span class="tag">${r.difficulty}</span>` : ''}
+          ${r.problems ? `<span class="tag">📝 ${r.problems}</span>` : ''}
+          ${r.is_free ? `<span class="tag ${r.is_free.toLowerCase().includes('free')?'tag-g':''}">${r.is_free}</span>` : ''}
+        </div>
+        <div class="cfoot"><span class="clink">Practice Now →</span></div>`;
+
+    } else if (type === 'entertainment' || selCat === 'entertainment') {
+      body = `${header}
+        <div class="ctitle">${title}</div>
+        <div class="cdesc">${desc}</div>
+        <div class="cmeta">
+          ${r.genre ? `<span class="tag">${r.genre}</span>` : ''}
+          ${r.language ? `<span class="tag">${r.language}</span>` : ''}
+          ${r.year ? `<span class="tag">${r.year}</span>` : ''}
+          ${r.subscription ? `<span class="tag ${r.subscription.toLowerCase().includes('free')?'tag-g':''}">${r.subscription}</span>` : ''}
+        </div>
+        <div class="cfoot"><span class="clink">Watch Now →</span></div>`;
+
+    } else {
+      body = `${header}
+        <div class="ctitle">${title}</div>
+        <div class="cdesc">${desc}</div>
+        <div class="cfoot"><span class="clink">View →</span></div>`;
+    }
+
+    a.innerHTML = budgeBadge + body;
+    grid.appendChild(a);
+  });
+}
+
+// ── CHARTS ────────────────────────────────────────────────────
+function renderCharts(results) {
+  document.getElementById('chartsRow').style.display = 'grid';
+
+  const pc = {}, pco = {};
+  results.forEach(r => {
+    const p = r.platform || 'Other';
+    pc[p]  = (pc[p] || 0) + 1;
+    pco[p] = r.platform_color || '#ff6a00';
+  });
+  const pl = Object.keys(pc), pv = Object.values(pc), pca = pl.map(p => pco[p]);
+
+  if (pieInst) pieInst.destroy();
+  pieInst = new Chart(document.getElementById('pieChart').getContext('2d'), {
+    type: 'doughnut',
+    data: { labels: pl, datasets: [{ data: pv, backgroundColor: pca, borderWidth: 2, borderColor: '#0a0500' }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#8a6a50', font: { size: 10 } } } } }
+  });
+
+  const rd = results.filter(r => r.rating && parseFloat(r.rating) > 0).slice(0, 7);
+  if (rd.length >= 2) {
+    if (barInst) barInst.destroy();
+    barInst = new Chart(document.getElementById('barChart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: rd.map(r => (r.title || '').substring(0, 18) + '...'),
+        datasets: [{ data: rd.map(r => parseFloat(r.rating)||0), backgroundColor: rd.map(r => (r.platform_color||'#ff6a00')+'cc'), borderColor: rd.map(r => r.platform_color||'#ff6a00'), borderWidth: 2, borderRadius: 5 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: { y: { min:0, max:5, ticks:{color:'#8a6a50'}, grid:{color:'rgba(255,106,0,0.05)'} }, x: { ticks:{color:'#8a6a50', font:{size:9}, maxRotation:40}, grid:{display:false} } },
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+}
+
+document.getElementById('mainSearch').focus();
+</script>
+</body>
+</html>

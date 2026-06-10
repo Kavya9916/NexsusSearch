@@ -1,0 +1,675 @@
+<<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusSearch – {{ cat_info.title }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--pri:#ff6a00;--sec:#cc2200;--gold:#ffd700;--bg:#0a0500;--surface:rgba(255,106,0,0.05);--border:rgba(255,106,0,0.15);--text:#f5e6d8;--muted:#8a6a50}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+.grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,106,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,106,0,0.03) 1px,transparent 1px);background-size:80px 80px}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;padding:12px 24px;background:rgba(10,5,0,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.nl{display:flex;align-items:center;gap:14px}
+.nb{display:flex;align-items:center;gap:8px;text-decoration:none}
+.ni{width:28px;height:28px;background:linear-gradient(135deg,var(--pri),var(--sec));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.nn{font-family:'Orbitron',monospace;font-size:12px;font-weight:900;color:var(--pri);letter-spacing:2px}
+.cat-title-nav{font-size:13px;font-weight:600;color:var(--text)}
+.ai-pill{padding:3px 9px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:20px;font-size:10px;font-weight:700;color:#86efac}
+.no-ai-pill{padding:3px 9px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.25);border-radius:20px;font-size:10px;font-weight:700;color:var(--gold)}
+.nr{display:flex;gap:8px}
+.btn-bk{padding:6px 13px;background:rgba(255,106,0,.07);border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:12px;text-decoration:none;transition:all .2s}
+.btn-bk:hover{border-color:var(--pri);color:var(--pri)}
+
+main{max-width:1200px;margin:0 auto;padding:28px 24px;position:relative;z-index:1}
+
+/* SEARCH BOX */
+.search-box{background:linear-gradient(135deg,rgba(255,106,0,.07),rgba(204,34,0,.05));border:1px solid var(--border);border-radius:18px;padding:24px 28px;margin-bottom:28px}
+.sb-top{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.sb-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.sb-info h2{font-family:'Orbitron',monospace;font-size:18px;font-weight:700;color:var(--text)}
+.sb-info p{font-size:12px;color:var(--muted);margin-top:2px}
+.budget-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.budget-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:5px}
+.budget-in{background:rgba(255,106,0,.07);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;width:140px;transition:all .3s}
+.budget-in:focus{border-color:var(--pri)}
+.budget-in::placeholder{color:var(--muted)}
+.bq-btn{padding:6px 13px;background:rgba(255,106,0,.08);border:1px solid rgba(255,106,0,.18);border-radius:7px;font-size:12px;font-weight:600;color:#c49a7a;cursor:pointer;transition:all .2s}
+.bq-btn:hover,.bq-btn.sel{background:rgba(255,215,0,.12);border-color:var(--gold);color:var(--gold)}
+.search-row{display:flex;gap:10px}
+.s-in{flex:1;background:rgba(255,106,0,.06);border:1.5px solid var(--border);border-radius:11px;padding:13px 18px;color:var(--text);font-size:15px;font-family:'Inter',sans-serif;outline:none;transition:all .3s}
+.s-in:focus{border-color:var(--pri);background:rgba(255,106,0,.09);box-shadow:0 0 0 3px rgba(255,106,0,.1)}
+.s-in::placeholder{color:var(--muted)}
+.s-btn{padding:13px 28px;background:linear-gradient(135deg,var(--pri),var(--sec));border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:700;font-family:'Rajdhani',sans-serif;letter-spacing:1px;cursor:pointer;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.s-btn:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 6px 18px rgba(255,106,0,.35)}
+.s-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+/* STATUS */
+.status-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.result-count{font-size:13px;color:var(--muted)}
+.result-count span{color:var(--pri);font-weight:700}
+.ai-tag{display:flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:20px;font-size:11px;font-weight:600;color:#86efac}
+.scraper-tag{display:flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);border-radius:20px;font-size:11px;font-weight:600;color:var(--gold)}
+
+/* LOADING */
+.loading{display:none;text-align:center;padding:60px 0}
+.loading.show{display:block}
+.spin{width:48px;height:48px;border:3px solid rgba(255,106,0,.1);border-top-color:var(--pri);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-txt{font-family:'Orbitron',monospace;font-size:13px;color:var(--muted)}
+
+/* NO RESULTS */
+.no-results{display:none;text-align:center;padding:60px 20px}
+.no-results.show{display:flex;flex-direction:column;align-items:center;gap:12px}
+.nr-icon{font-size:60px;opacity:.4}
+.nr-title{font-family:'Orbitron',monospace;font-size:18px;color:var(--muted)}
+.nr-sub{font-size:13px;color:var(--muted);opacity:.7;max-width:400px;line-height:1.6}
+.nr-btn{padding:10px 22px;background:linear-gradient(135deg,var(--pri),var(--sec));border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:600;font-family:'Rajdhani',sans-serif;cursor:pointer;margin-top:8px;transition:all .2s}
+.nr-btn:hover{filter:brightness(1.1)}
+
+/* RESULTS GRID */
+.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:28px}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;transition:all .3s;position:relative;overflow:hidden;cursor:pointer;text-decoration:none;display:block;animation:fadeUp .4s ease both}
+.card:hover{border-color:var(--pri);transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.4)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.plat-badge{display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700}
+.card-rating{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--gold)}
+.card-title{font-size:14px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:8px;display:-webkit-box;line-clamp: 2; -webkit-line-clamp: 2;-webkit-box-orient:vertical;overflow:hidden;}
+.card-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px;display:-webkit-box;line-clamp: 2; -webkit-line-clamp: 2;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.meta-tag{padding:3px 9px;border-radius:5px;font-size:11px;font-weight:600;background:rgba(255,106,0,.08);color:#c49a7a;border:1px solid rgba(255,106,0,.12)}
+.meta-green{background:rgba(34,197,94,.08);color:#86efac;border-color:rgba(34,197,94,.15)}
+.meta-gold{background:rgba(255,215,0,.08);color:var(--gold);border-color:rgba(255,215,0,.15)}
+.meta-red{background:rgba(239,68,68,.08);color:#fca5a5;border-color:rgba(239,68,68,.15)}
+.card-price{font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:var(--pri)}
+.card-price-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.card-orig{font-size:12px;color:var(--muted);text-decoration:line-through}
+.card-disc{padding:2px 7px;background:rgba(34,197,94,.1);border-radius:4px;font-size:11px;font-weight:700;color:#86efac}
+.card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid rgba(255,106,0,.08)}
+.card-link{font-size:11px;font-weight:600;color:var(--pri);display:flex;align-items:center;gap:4px}
+.card-delivery{font-size:11px;color:var(--muted)}
+.within-budget{position:absolute;top:12px;right:12px;padding:2px 8px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);border-radius:5px;font-size:10px;font-weight:700;color:#86efac}
+.over-budget{position:absolute;top:12px;right:12px;padding:2px 8px;background:rgba(255,106,0,.1);border:1px solid rgba(255,106,0,.2);border-radius:5px;font-size:10px;color:#c49a7a}
+/* Compare checkbox */
+.compare-check{position:absolute;top:12px;left:12px;opacity:0;transition:opacity .2s}
+.card:hover .compare-check{opacity:1}
+.compare-check.checked{opacity:1}
+.compare-check input{width:16px;height:16px;accent-color:var(--gold);cursor:pointer}
+
+/* COMPARE BAR */
+.compare-bar{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(10,5,0,.97);border-top:2px solid var(--gold);padding:14px 28px;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;backdrop-filter:blur(20px)}
+.compare-bar.show{display:flex}
+.cb-left{font-size:13px;color:var(--text)}
+.cb-left span{color:var(--gold);font-weight:700}
+.cb-right{display:flex;gap:10px}
+.cb-btn{padding:9px 20px;background:linear-gradient(135deg,var(--gold),var(--pri));border:none;border-radius:9px;color:#000;font-size:13px;font-weight:700;font-family:'Rajdhani',sans-serif;cursor:pointer;transition:all .2s}
+.cb-btn:hover{filter:brightness(1.1)}
+.cb-clear{padding:9px 16px;background:rgba(255,106,0,.08);border:1px solid var(--border);border-radius:9px;color:var(--muted);font-size:13px;cursor:pointer}
+
+/* CHARTS */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
+.chart-box.hidden{display:none}
+.ct{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px}
+.ct span{color:var(--pri)}
+.cw{position:relative;height:180px}
+
+footer{border-top:1px solid var(--border);padding:18px 24px;text-align:center;color:var(--muted);font-size:12px;position:relative;z-index:1;margin-top:40px}
+footer span{color:var(--pri)}
+@media(max-width:700px){.results-grid{grid-template-columns:1fr}.charts-row{grid-template-columns:1fr}.search-row{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="grid"></div>
+<nav>
+  <div class="nl">
+    <a href="/dashboard" class="nb"><div class="ni">🔥</div><div class="nn">NEXUS</div></a>
+    <div class="cat-title-nav">{{ cat_info.icon }} {{ cat_info.title }}</div>
+    {% if ai_ready %}<span class="ai-pill">✨ AI ON</span>{% else %}<span class="no-ai-pill">⚡ Smart Search</span>{% endif %}
+  </div>
+  <div class="nr">
+    <a href="/dashboard" class="btn-bk">← Dashboard</a>
+    <a href="/logout" class="btn-bk">⏻ Logout</a>
+  </div>
+</nav>
+
+<main>
+  <!-- SEARCH BOX -->
+  <div class="search-box">
+    <div class="sb-top">
+      <div id="sbIcon"></div>
+      <div class="sb-info">
+        <h2>{{ cat_info.title }}</h2>
+        <p>{{ cat_info.desc }}</p>
+      </div>
+    </div>
+
+    <!-- Budget row — only for shopping/courses -->
+    <div class="budget-row" id="budgetRow" {% if cat_name not in ['shopping','courses'] %}style="display:none"{% endif %}>
+      <div class="budget-lbl">💰 MAX BUDGET:</div>
+      <input type="number" class="budget-in" id="budgetIn" placeholder="e.g. 5000" min="0">
+      <button class="bq-btn" onclick="setBudget(0)">Any</button>
+      <button class="bq-btn" onclick="setBudget(500)">₹500</button>
+      <button class="bq-btn" onclick="setBudget(1000)">₹1000</button>
+      <button class="bq-btn" onclick="setBudget(5000)">₹5000</button>
+      <button class="bq-btn" onclick="setBudget(15000)">₹15K</button>
+      <button class="bq-btn" onclick="setBudget(30000)">₹30K</button>
+    </div>
+
+    <div class="search-row">
+      <input type="text" class="s-in" id="searchIn"
+        placeholder="Search {{ cat_info.title | lower }}... e.g. {% if cat_name=='courses' %}Python programming{% elif cat_name=='jobs' %}Data Analyst fresher{% elif cat_name=='shopping' %}Samsung mobile under 15000{% elif cat_name=='scholarships' %}merit scholarship for engineering{% elif cat_name=='coding' %}DSA arrays problems{% else %}Sacred Games series{% endif %}"
+        onkeypress="if(event.key==='Enter')doSearch()">
+      <button class="s-btn" id="searchBtn" onclick="doSearch()">
+        <span>🔍</span> SEARCH
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading" id="loadDiv">
+    <div class="spin"></div>
+    <div class="load-txt" id="loadTxt">SEARCHING ACROSS ALL PLATFORMS...</div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar" id="statusBar" style="display:none">
+    <div class="result-count" id="resultCount"></div>
+    <div id="aiTag"></div>
+  </div>
+
+  <!-- NO RESULTS -->
+  <div class="no-results" id="noResults">
+    <div class="nr-icon">🔍</div>
+    <div class="nr-title">No Results Found</div>
+    <div class="nr-sub" id="noResultsMsg">Try different keywords or adjust your budget.</div>
+    <button class="nr-btn" onclick="clearSearch()">Try Again</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-grid" id="resultsGrid"></div>
+
+  <!-- CHARTS -->
+  <div class="charts-row" id="chartsRow" style="display:none">
+    <div class="chart-box">
+      <div class="ct">Platform <span>Distribution</span></div>
+      <div class="cw"><canvas id="pieChart"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <div class="ct">Ratings <span>Comparison</span></div>
+      <div class="cw"><canvas id="barChart"></canvas></div>
+    </div>
+  </div>
+</main>
+
+<!-- COMPARE BAR -->
+<div class="compare-bar" id="compareBar">
+  <div class="cb-left">✅ <span id="cbCount">0</span> items selected for comparison</div>
+  <div class="cb-right">
+    <button class="cb-clear" onclick="clearCompare()">Clear</button>
+    <button class="cb-btn" onclick="goCompare()">⚖️ Compare Now</button>
+  </div>
+</div>
+
+<footer>{{ cat_info.icon }} {{ cat_info.title }} — <span>NexusSearch</span> {% if ai_ready %}· <span>✨ AI Powered</span>{% endif %}</footer>
+
+<script>
+const CAT = "{{ cat_name }}";
+let allResults = [];
+let compareList = [];
+let pieChartInst = null;
+let barChartInst = null;
+
+function setBudget(val) {
+  document.getElementById('budgetIn').value = val || '';
+  document.querySelectorAll('.bq-btn').forEach(b => b.classList.remove('sel'));
+  event.target.classList.add('sel');
+}
+
+function clearSearch() {
+  document.getElementById('searchIn').value = '';
+  document.getElementById('resultsGrid').innerHTML = '';
+  document.getElementById('noResults').classList.remove('show');
+  document.getElementById('statusBar').style.display = 'none';
+  document.getElementById('chartsRow').style.display = 'none';
+  document.getElementById('searchIn').focus();
+}
+
+function doSearch() {
+  const q = document.getElementById('searchIn').value.trim();
+  if (!q) {
+    document.getElementById('searchIn').focus();
+    return;
+  }
+
+  const budgetVal = document.getElementById('budgetIn').value;
+  const budget = budgetVal ? parseFloat(budgetVal) : null;
+
+  // UI setup
+  document.getElementById('loadDiv').classList.add('show');
+  document.getElementById('resultsGrid').innerHTML = '';
+  document.getElementById('noResults').classList.remove('show');
+  document.getElementById('statusBar').style.display = 'none';
+  document.getElementById('chartsRow').style.display = 'none';
+  document.getElementById('searchBtn').disabled = true;
+  document.getElementById('searchBtn').innerHTML = '<span>⏳</span> Searching...';
+
+  const ai = window.NEXUS_CONFIG.ai_ready;
+  ;
+  document.getElementById('loadTxt').textContent = ai
+    ? '✨ AI IS SEARCHING ACROSS ALL PLATFORMS...'
+    : '🔍 SEARCHING ACROSS ALL PLATFORMS...';
+
+  fetch('/search', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({query: q, category: CAT, budget: budget})
+  })
+  .then(r => r.json())
+  .then(data => {
+    document.getElementById('loadDiv').classList.remove('show');
+    document.getElementById('searchBtn').disabled = false;
+    document.getElementById('searchBtn').innerHTML = '<span>🔍</span> SEARCH';
+
+    let results = data.results || [];
+    console.log('Results received:', results.length, 'AI:', data.ai_used);
+
+    // ── SMART BUDGET FILTER ──────────────────────────────
+    // Only filter if budget set AND results have price info
+    if (budget && budget > 0 && results.length > 0) {
+      const withinBudget = results.filter(r => {
+        const priceStr = String(r.price || r.amount || r.salary || '');
+        // Extract numeric value from price string
+        const nums = priceStr.replace(/[₹,\s]/g,'').match(/\d+/);
+        if (!nums) return true; // No price = always show
+        const priceNum = parseFloat(nums[0]);
+        if (isNaN(priceNum)) return true;
+        return priceNum <= budget;
+      });
+
+      if (withinBudget.length > 0) {
+        results = withinBudget;
+      } else {
+        // Show ALL results but mark over-budget ones
+        // Don't hide everything!
+        results = results; // show all
+      }
+    }
+
+    allResults = results;
+
+    if (!results || results.length === 0) {
+      showNoResults(budget, q);
+      return;
+    }
+
+    // Show status
+    document.getElementById('statusBar').style.display = 'flex';
+    document.getElementById('resultCount').innerHTML =
+      `Found <span>${results.length}</span> results for "<span>${q}</span>"`;
+
+    const aiTagEl = document.getElementById('aiTag');
+    if (data.ai_used) {
+      aiTagEl.innerHTML = '<div class="ai-tag">✨ AI Generated Results</div>';
+    } else {
+      aiTagEl.innerHTML = '<div class="scraper-tag">⚡ Smart Search Results</div>';
+    }
+
+    // Render results
+    renderResults(results, budget);
+
+    // Show charts
+    if (results.length >= 2) {
+      renderCharts(results);
+    }
+  })
+  .catch(err => {
+    console.error('Search error:', err);
+    document.getElementById('loadDiv').classList.remove('show');
+    document.getElementById('searchBtn').disabled = false;
+    document.getElementById('searchBtn').innerHTML = '<span>🔍</span> SEARCH';
+    showNoResults(null, q, 'Connection error. Please try again.');
+  });
+}
+
+function showNoResults(budget, query, customMsg) {
+  document.getElementById('noResults').classList.add('show');
+  let msg = '';
+  if (customMsg) {
+    msg = customMsg;
+  } else if (budget && budget > 0) {
+    msg = `No results found for "${query}" within ₹${budget.toLocaleString()} budget. Try increasing your budget or use different keywords.`;
+  } else {
+    msg = `No results found for "${query}". Try different keywords.`;
+  }
+  document.getElementById('noResultsMsg').textContent = msg;
+}
+
+function renderResults(results, budget) {
+  const grid = document.getElementById('resultsGrid');
+  grid.innerHTML = '';
+
+  results.forEach((r, i) => {
+    const card = document.createElement('a');
+    card.className = 'card';
+    card.href = r.url && r.url !== '#' ? r.url : '#';
+    if (r.url && r.url !== '#') card.target = '_blank';
+    card.style.animationDelay = `${i * 0.06}s`;
+    card.onclick = (e) => {
+      // Don't navigate if clicking compare checkbox
+      if (e.target.type === 'checkbox') e.preventDefault();
+    };
+
+    const color = r.platform_color || '#ff6a00';
+    const logo  = r.platform_logo  || '🔍';
+    const plat  = r.platform       || 'Platform';
+    const title = r.title          || 'Result';
+    const desc  = r.description    || '';
+
+    // Check if over budget
+    let budgetBadge = '';
+    if (budget && budget > 0) {
+      const priceStr = String(r.price || r.amount || '');
+      const nums = priceStr.replace(/[₹,\s]/g,'').match(/\d+/);
+      if (nums) {
+        const pNum = parseFloat(nums[0]);
+        if (!isNaN(pNum)) {
+          if (pNum <= budget) {
+            budgetBadge = '<div class="within-budget">✅ Within Budget</div>';
+          } else {
+            budgetBadge = '<div class="over-budget">↑ Over Budget</div>';
+          }
+        }
+      }
+    }
+
+    // Compare checkbox
+    const chk = `<div class="compare-check" id="chk_${i}">
+      <input type="checkbox" onchange="toggleCompare(${i}, this.checked)" title="Add to compare">
+    </div>`;
+
+    // Build card based on type
+    let inner = '';
+    const type = r.type || CAT;
+
+    if (type === 'course' || CAT === 'courses') {
+      inner = buildCourseCard(r, color, logo, plat, title, desc);
+    } else if (type === 'job' || CAT === 'jobs') {
+      inner = buildJobCard(r, color, logo, plat, title, desc);
+    } else if (type === 'product' || CAT === 'shopping') {
+      inner = buildProductCard(r, color, logo, plat, title, desc);
+    } else if (type === 'scholarship' || CAT === 'scholarships') {
+      inner = buildScholarshipCard(r, color, logo, plat, title, desc);
+    } else if (type === 'coding' || CAT === 'coding') {
+      inner = buildCodingCard(r, color, logo, plat, title, desc);
+    } else if (type === 'entertainment' || CAT === 'entertainment') {
+      inner = buildEntertainmentCard(r, color, logo, plat, title, desc);
+    } else {
+      inner = buildGenericCard(r, color, logo, plat, title, desc);
+    }
+
+    card.innerHTML = chk + budgetBadge + inner;
+    grid.appendChild(card);
+  });
+}
+
+function buildCourseCard(r, color, logo, plat, title, desc) {
+  const price   = r.price || 'Check';
+  const rating  = r.rating || '';
+  const students= r.students || '';
+  const level   = r.level || '';
+  const cert    = r.certificate || '';
+  const dur     = r.duration || '';
+  return `
+    <div class="card-header">
+      <div class="plat-badge" style="background:${color}18;color:${color};border:1px solid ${color}33">${logo} ${plat}</div>
+      ${rating ? `<div class="card-rating">⭐ ${rating}</div>` : ''}
+    </div>
+    <div class="card-title">${title}</div>
+    <div class="card-desc">${desc}</div>
+    <div class="card-meta">
+      <span class="meta-tag ${price==='Free'||price==='Free Audit'||price.toLowerCase().includes('free')?'meta-green':''}">${price}</span>
+      ${level ? `<span class="meta-tag">${level}</span>` : ''}
+      ${dur ? `<span class="meta-tag">⏱️ ${dur}</span>` : ''}
+      ${cert==='Yes' ? `<span class="meta-tag meta-gold">🏆 Certificate</span>` : ''}
+    </div>
+    <div class="card-footer">
+      <span class="card-link">View Course →</span>
+      ${students ? `<span class="card-delivery">👥 ${students}</span>` : ''}
+    </div>`;
+}
+
+function buildJobCard(r, color, logo, plat, title, desc) {
+  const salary  = r.salary || 'Check';
+  const loc     = r.location || 'India';
+  const exp     = r.experience || '';
+  const posted  = r.posted || '';
+  const jobType = r.job_type || '';
+  return `
+    <div class="card-header">
+      <div class="plat-badge" style="background:${color}18;color:${color};border:1px solid ${color}33">${logo} ${plat}</div>
+      ${posted ? `<div style="font-size:11px;color:var(--muted)">${posted}</div>` : ''}
+    </div>
+    <div class="card-title">${title}</div>
+    <div class="card-desc">${desc}</div>
+    <div class="card-meta">
+      <span class="meta-tag meta-green">💰 ${salary}</span>
+      <span class="meta-tag">📍 ${loc}</span>
+      ${exp ? `<span class="meta-tag">${exp}</span>` : ''}
+      ${jobType ? `<span class="meta-tag">${jobType}</span>` : ''}
+    </div>
+    <div class="card-footer">
+      <span class="card-link">Apply Now →</span>
+    </div>`;
+}
+
+function buildProductCard(r, color, logo, plat, title, desc) {
+  const price    = r.price || 'Check';
+  const origPrice= r.original_price || '';
+  const discount = r.discount || '';
+  const rating   = r.rating || '';
+  const reviews  = r.reviews || '';
+  const delivery = r.delivery || '';
+  return `
+    <div class="card-header">
+      <div class="plat-badge" style="background:${color}18;color:${color};border:1px solid ${color}33">${logo} ${plat}</div>
+      ${rating ? `<div class="card-rating">⭐ ${rating}</div>` : ''}
+    </div>
+    <div class="card-title">${title}</div>
+    <div class="card-desc">${desc}</div>
+    <div class="card-price-row">
+      <div class="card-price">${price}</div>
+      ${origPrice ? `<div class="card-orig">${origPrice}</div>` : ''}
+      ${discount ? `<div class="card-disc">${discount}</div>` : ''}
+    </div>
+    <div class="card-footer">
+      <span class="card-link">View Product →</span>
+      <span class="card-delivery">${delivery}</span>
+    </div>`;
+}
+
+function buildScholarshipCard(r, color, logo, plat, title, desc) {
+  const amount  = r.amount || 'Check Website';
+  const deadline= r.deadline || 'Check Website';
+  const elig    = r.eligibility || '';
+  return `
+    <div class="card-header">
+      <div class="plat-badge" style="background:${color}18;color:${color};border:1px solid ${color}33">${logo} ${plat}</div>
+    </div>
+    <div class="card-title">${title}</div>
+    <div class="card-desc">${desc}</div>
+    <div class="card-meta">
+      <span class="meta-tag meta-gold">💰 ${amount}</span>
+      <span class="meta-tag meta-red">📅 ${deadline}</span>
+    </div>
+    ${elig ? `<div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5">📋 ${elig}</div>` : ''}
+    <div class="card-footer"><span class="card-link">Apply Now →</span></div>`;
+}
+
+function buildCodingCard(r, color, logo, plat, title, desc) {
+  const diff    = r.difficulty || 'Mixed';
+  const problems= r.problems || '';
+  const topics  = r.topics || '';
+  const isFree  = r.is_free || '';
+  return `
+    <div class="card-header">
+      <div class="plat-badge" style="background:${color}18;color:${color};border:1px solid ${color}33">${logo} ${plat}</div>
+      <div style="font-size:11px;font-weight:600;color:${diff.includes('Hard')?'#fca5a5':diff.includes('Easy')?'#86efac':'#ffd0a0'}">${diff}</div>
+    </div>
+    <div class="card-title">${title}</div>
+    <div class="card-desc">${desc}</div>
+    <div class="card-meta">
+      ${problems ? `<span class="meta-tag">📝 ${problems}</span>` : ''}
+      ${isFree ? `<span class="meta-tag ${isFree.toLowerCase().includes('free')?'meta-green':''}">${isFree}</span>` : ''}
+    </div>
+    ${topics ? `<div style="font-size:11px;color:var(--muted);margin-bottom:10px">🏷️ ${topics}</div>` : ''}
+    <div class="card-footer"><span class="card-link">Practice Now →</span></div>`;
+}
+
+function buildEntertainmentCard(r, color, logo, plat, title, desc) {
+  const genre   = r.genre || '';
+  const lang    = r.language || '';
+  const sub     = r.subscription || '';
+  const year    = r.year || '';
+  const rating  = r.rating || '';
+  const ctype   = r.content_type || '';
+  return `
+    <div class="card-header">
+      <div class="plat-badge" style="background:${color}18;color:${color};border:1px solid ${color}33">${logo} ${plat}</div>
+      ${rating ? `<div class="card-rating">⭐ ${rating}</div>` : ''}
+    </div>
+    <div class="card-title">${title}</div>
+    <div class="card-desc">${desc}</div>
+    <div class="card-meta">
+      ${genre ? `<span class="meta-tag">${genre}</span>` : ''}
+      ${lang ? `<span class="meta-tag">${lang}</span>` : ''}
+      ${year ? `<span class="meta-tag">${year}</span>` : ''}
+      ${ctype ? `<span class="meta-tag">${ctype}</span>` : ''}
+      ${sub ? `<span class="meta-tag ${sub.toLowerCase().includes('free')?'meta-green':''}">${sub}</span>` : ''}
+    </div>
+    <div class="card-footer"><span class="card-link">Watch Now →</span></div>`;
+}
+
+function buildGenericCard(r, color, logo, plat, title, desc) {
+  return `
+    <div class="card-header">
+      <div class="plat-badge" style="background:${color}18;color:${color};border:1px solid ${color}33">${logo} ${plat}</div>
+    </div>
+    <div class="card-title">${title}</div>
+    <div class="card-desc">${desc}</div>
+    <div class="card-footer"><span class="card-link">View →</span></div>`;
+}
+
+// ── COMPARE ──────────────────────────────────────────────────
+function toggleCompare(idx, checked) {
+  const item = allResults[idx];
+  if (checked) {
+    if (compareList.length >= 4) {
+      alert('Maximum 4 items can be compared!');
+      document.querySelector(`#chk_${idx} input`).checked = false;
+      return;
+    }
+    compareList.push({idx, item});
+    document.getElementById(`chk_${idx}`).classList.add('checked');
+  } else {
+    compareList = compareList.filter(c => c.idx !== idx);
+    document.getElementById(`chk_${idx}`).classList.remove('checked');
+  }
+  const bar = document.getElementById('compareBar');
+  document.getElementById('cbCount').textContent = compareList.length;
+  compareList.length >= 2 ? bar.classList.add('show') : bar.classList.remove('show');
+}
+
+function clearCompare() {
+  compareList = [];
+  document.querySelectorAll('.compare-check input').forEach(c => c.checked = false);
+  document.querySelectorAll('.compare-check').forEach(c => c.classList.remove('checked'));
+  document.getElementById('compareBar').classList.remove('show');
+}
+
+function goCompare() {
+  if (compareList.length < 2) return;
+  const items = compareList.map(c => c.item);
+  sessionStorage.setItem('compareItems', JSON.stringify(items));
+  window.location.href = '/compare';
+}
+
+// ── CHARTS ──────────────────────────────────────────────────
+function renderCharts(results) {
+  document.getElementById('chartsRow').style.display = 'grid';
+
+  // Platform counts
+  const platCount = {};
+  const platColors = {};
+  results.forEach(r => {
+    const p = r.platform || 'Other';
+    platCount[p] = (platCount[p] || 0) + 1;
+    platColors[p] = r.platform_color || '#ff6a00';
+  });
+
+  const platLabels = Object.keys(platCount);
+  const platVals   = Object.values(platCount);
+  const platColArr = platLabels.map(p => platColors[p]);
+
+  if (pieChartInst) pieChartInst.destroy();
+  pieChartInst = new Chart(document.getElementById('pieChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: platLabels,
+      datasets: [{data: platVals, backgroundColor: platColArr, borderWidth: 2, borderColor: '#0a0500'}]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {legend: {labels: {color: '#8a6a50', font: {size: 11}}}}
+    }
+  });
+
+  // Ratings bar chart
+  const ratingData = results
+    .filter(r => r.rating && parseFloat(r.rating) > 0)
+    .slice(0, 8)
+    .map(r => ({
+      label: (r.title || '').substring(0, 20) + '...',
+      val: parseFloat(r.rating) || 0,
+      color: r.platform_color || '#ff6a00'
+    }));
+
+  if (ratingData.length >= 2) {
+    if (barChartInst) barChartInst.destroy();
+    barChartInst = new Chart(document.getElementById('barChart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: ratingData.map(r => r.label),
+        datasets: [{
+          data: ratingData.map(r => r.val),
+          backgroundColor: ratingData.map(r => r.color + 'cc'),
+          borderColor: ratingData.map(r => r.color),
+          borderWidth: 2, borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: {
+          y: {min:0, max:5, ticks:{color:'#8a6a50'}, grid:{color:'rgba(255,106,0,0.05)'}},
+          x: {ticks:{color:'#8a6a50', maxRotation:40, font:{size:9}}, grid:{display:false}}
+        },
+        plugins: {legend: {display: false}}
+      }
+    });
+  } else {
+    document.getElementById('barChart').parentElement.parentElement.style.display = 'none';
+  }
+}
+
+// Auto-focus search
+document.getElementById('searchIn').focus();
+</script>
+</body>
+</html>
