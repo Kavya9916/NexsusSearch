@@ -11,7 +11,7 @@ import requests, json, re, os, time, urllib.parse
 # ═══════════════════════════════════════════════════════
 # ✅ ADD YOUR GEMINI API KEY HERE
 # ═══════════════════════════════════════════════════════
-GEMINI_API_KEY = "enter yur api key here"
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY","")
 # ═══════════════════════════════════════════════════════
 
 try:
