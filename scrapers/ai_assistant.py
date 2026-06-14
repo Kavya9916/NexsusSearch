@@ -6,12 +6,15 @@ NexusSearch — AI Assistant (FULLY FIXED)
 - Smart retry on 503/429/404
 """
 
-import requests, json, re, os, time, urllib.parse
+import requests, json, re, time, urllib.parse
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # ═══════════════════════════════════════════════════════
 # ✅ ADD YOUR GEMINI API KEY HERE
 # ═══════════════════════════════════════════════════════
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY","")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY","")
 # ═══════════════════════════════════════════════════════
 
 try:
