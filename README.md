@@ -21,6 +21,13 @@ NexusSearch automatically searches **50+ platforms** across 6 categories when yo
 - 🌐 **Real Web Scraping** — using DuckDuckGo search + BeautifulSoup
 - 👋 **Animated Logout** — beautiful goodbye page with countdown
 
+## Screenshots
+
+
+
+![Screenshot 1](AUTONOMOUS%20INTELLIGENT%20MULTI-PLATFORM%20SEARCH%20SYSTEM_20261108_121836_0000.jpg)
+
+
 ## 🛠️ Setup & Run (VSCode)
 
 ### Step 1 — Open in VSCode
